@@ -37,3 +37,29 @@ export const PAYMENT_OPTIONS = [
   PAYMENT_OPTION.BANK_TRANSFER,
   PAYMENT_OPTION.CASH,
 ];
+
+export const DB_METHOD_STATUS = {
+  SUCCESS: "success",
+  ERROR: "error",
+};
+
+export const DB_COLLECTION = {
+  USERS: "users",
+  RECEIPTS: "receipts",
+};
+
+export const OPTIONS_HOUR = Array.from({ length: 12 }, (_, index) => {
+  const hour = index + 1; // Generates numbers from 1 to 12
+  return {
+    value: hour.toString(),
+    label: `${hour}`,
+  };
+});
+
+export const OPTIONS_MINUTE = Array.from({ length: 12 }, (_, index) => {
+  const minute = index * 5; // Generates 0, 5, 10, ..., 55
+  return {
+    value: minute.toString().padStart(2, "0"), // Ensures two-digit format
+    label: minute.toString().padStart(2, "0"),
+  };
+});

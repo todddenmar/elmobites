@@ -5,29 +5,29 @@ import { TImageReceipt } from "@/typings";
 import Image from "next/image";
 import { ScrollArea } from "../ui/scroll-area";
 import { compressImageToWebP } from "@/lib/utils";
-import { dbAddNewReceipt, dbUploadReceipt } from "@/queries/db-create";
-import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
-import { DB_METHOD_STATUS } from "@/lib/config";
+import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import LoadingComponent from "./LoadingComponent";
 import { Button } from "../ui/button";
+
 import {
   dbDeleteImageReceipt,
-  deleteImageFromStorage,
-} from "@/queries/db-delete";
+  dbSetDocument,
+  dbUploadMediaByPath,
+  deleteMediaFromStorage,
+} from "@/lib/firebase/actions";
 type ReceiptScreenshotUploadProps = {
   value: TImageReceipt | null;
   onChange: (val: TImageReceipt | null) => void;
   emailAddress: string;
-  racerID: string;
+  userID: string;
 };
 function ReceiptScreenshotUpload({
   value,
   onChange,
   emailAddress,
-  racerID,
+  userID,
 }: ReceiptScreenshotUploadProps) {
-  const { event } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     // Do something with the files
@@ -44,10 +44,9 @@ function ReceiptScreenshotUpload({
       }
       const newID = crypto.randomUUID();
       setIsLoading(true);
-      const resReceipt = await dbUploadReceipt({
-        eventID: event.id,
-        imageID: newID,
+      const resReceipt = await dbUploadMediaByPath({
         mediaFile: webpFile || previewFiles[0],
+        path: `/receipts/${newID}`,
       });
       if (resReceipt.status === DB_METHOD_STATUS.ERROR) {
         toast.error(resReceipt.message);
@@ -56,12 +55,13 @@ function ReceiptScreenshotUpload({
       const newImageReceipt: TImageReceipt = {
         id: newID,
         url: resReceipt.data,
-        racerID: racerID,
+        userID: userID,
         emailAddress: emailAddress,
       };
-      const res = await dbAddNewReceipt({
-        eventID: event.id,
-        imageReceipt: newImageReceipt,
+      const res = await dbSetDocument({
+        collectionName: DB_COLLECTION.RECEIPTS,
+        id: newID,
+        data: newImageReceipt,
       });
       if (res.status === DB_METHOD_STATUS.ERROR) {
         toast.error(res.message);
@@ -84,18 +84,15 @@ function ReceiptScreenshotUpload({
   });
 
   const onDelete = async () => {
-    if (!value || !event) return;
+    if (!value) return;
     setIsLoading(true);
-    const resStorage = await deleteImageFromStorage(
-      `receipts/${event?.id}/${value.id}`
-    );
+    const resStorage = await deleteMediaFromStorage(`receipts/${value.id}`);
     if (resStorage?.status === DB_METHOD_STATUS.ERROR) {
       console.log(resStorage.message);
       return;
     }
     const resImage = await dbDeleteImageReceipt({
-      eventID: event?.id,
-      imageID: value.id,
+      id: value.id,
     });
     if (resImage?.status === DB_METHOD_STATUS.ERROR) {
       console.log(resImage.message);

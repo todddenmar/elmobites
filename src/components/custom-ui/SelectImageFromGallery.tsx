@@ -1,4 +1,3 @@
-import { useAppStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -11,14 +10,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
+import { TMediaFile } from "@/typings";
 function SelectImageFromGallery({
+  galleryImages,
   value,
   onChange,
 }: {
+  galleryImages: TMediaFile[];
   value: string | null;
   onChange: (val: string | null) => void;
 }) {
-  const { currentEvent } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className="space-y-4">
@@ -39,7 +40,7 @@ function SelectImageFromGallery({
           </DialogHeader>
           <div className="overflow-y-auto h-[300px]">
             <div className="grid grid-cols-3 gap-4">
-              {currentEvent?.galleryImages?.map((item, idx) => {
+              {galleryImages?.map((item, idx) => {
                 const isActive = value === item.url;
                 return (
                   <div
