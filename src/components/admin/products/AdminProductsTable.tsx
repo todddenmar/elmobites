@@ -64,7 +64,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
       },
       cell: ({ row }) => {
         const name: string = row.getValue("name");
-        return <div className="px-4 capitalize">{name}</div>;
+        return <div className="px-3 capitalize">{name}</div>;
       },
     },
     {
@@ -81,7 +81,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
         );
       },
       cell: ({ row }) => (
-        <div className="px-4 capitalize">{row.getValue("location")}</div>
+        <div className="px-3 capitalize">{row.getValue("location")}</div>
       ),
     },
 
@@ -99,7 +99,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
         );
       },
       cell: ({ row }) => (
-        <div className="px-4">
+        <div className="px-3">
           {formatDate(new Date(row.getValue("createdAt")), true)}
         </div>
       ),
@@ -132,7 +132,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
     },
   });
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 text-nowrap overflow-x-auto">
       <div className="gap-4 grid sm:grid-cols-3 2xl:flex items-center w-full">
         <Input
           placeholder="Filter by firstname..."

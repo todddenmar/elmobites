@@ -22,7 +22,6 @@ import SubmitLoadingButtons from "@/components/custom-ui/SubmitLoadingButtons";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { TStore } from "@/typings";
 import { dbCountDocuments, dbSetDocument } from "@/lib/firebase/actions";
-import { Label } from "@/components/ui/label";
 import { isValid, parse } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 const formSchema = z.object({
@@ -41,6 +40,12 @@ const formSchema = z.object({
     .regex(/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/, {
       message: "Coordinates must be in 'lat, lng' format",
     }),
+  openingTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+    message: "Opening time must be in HH:mm (24-hour) format",
+  }),
+  closingTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+    message: "Closing time must be in HH:mm (24-hour) format",
+  }),
 });
 type CreateStoreFormProps = {
   setClose: () => void;
@@ -48,8 +53,6 @@ type CreateStoreFormProps = {
 function CreateStoreForm({ setClose }: CreateStoreFormProps) {
   const { userData, currentStores, setCurrentStores } = useAppStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [openingTime, setOpeningTime] = useState<string>("");
-  const [closingTime, setClosingTime] = useState<string>("");
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,6 +62,8 @@ function CreateStoreForm({ setClose }: CreateStoreFormProps) {
       location: "",
       slug: "",
       coordinates: "",
+      openingTime: "08:00",
+      closingTime: "21:00",
     },
   });
 
@@ -81,7 +86,15 @@ function CreateStoreForm({ setClose }: CreateStoreFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    const { name, description, location, slug, coordinates } = values;
+    const {
+      name,
+      description,
+      location,
+      slug,
+      coordinates,
+      openingTime,
+      closingTime,
+    } = values;
     setIsLoading(true);
     if (!userData) {
       return;
@@ -113,6 +126,8 @@ function CreateStoreForm({ setClose }: CreateStoreFormProps) {
       coordinates: coordinates,
       images: [],
       thumbnailImage: null,
+      openingTime,
+      closingTime,
     };
 
     const res = await dbSetDocument({
@@ -200,24 +215,32 @@ function CreateStoreForm({ setClose }: CreateStoreFormProps) {
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Daily Opening Time</Label>
-                  <Input
-                    placeholder="00:00"
-                    value={openingTime}
-                    onChange={(val) => setOpeningTime(val.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Daily Closing Time</Label>
-                  <Input
-                    placeholder="23:59"
-                    value={closingTime}
-                    onChange={(val) => setClosingTime(val.target.value)}
-                  />
-                </div>
-              </div>
+              <FormField
+                control={form.control}
+                name="openingTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Daily Opening Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="closingTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Daily Closing Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}

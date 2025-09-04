@@ -19,7 +19,7 @@ export default function SignInRedirectPage() {
   const destinationURL =
     process.env.NODE_ENV === "development"
       ? "/sign-in"
-      : "https://eventracers.com/sign-in";
+      : `${process.env.NEXT_PUBLIC_URL}/sign-in`;
   const eventSlug = Array.isArray(param.slug) ? param.slug[0] : param.slug;
 
   useEffect(() => {

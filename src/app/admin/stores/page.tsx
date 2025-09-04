@@ -14,7 +14,7 @@ function AdminStoresPage() {
 
         <StoreCreateButton />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 grid">
         <AdminStoresTable stores={currentStores} />
       </div>
     </div>

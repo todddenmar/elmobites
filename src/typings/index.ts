@@ -69,6 +69,8 @@ export type TStore = {
   createdAt: string;
   timestamp: FieldValue | string;
   isActive?: boolean;
+  openingTime: string;
+  closingTime: string;
 };
 
 export type TProduct = {

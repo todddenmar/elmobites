@@ -34,6 +34,7 @@ import {
 import { formatDate } from "@/lib/utils";
 import { TStore } from "@/typings";
 import StoreActionButton from "./StoreActionButton";
+import { format, parse } from "date-fns";
 
 type AdminStoresTableProps = {
   stores: TStore[];
@@ -64,7 +65,7 @@ export function AdminStoresTable({ stores }: AdminStoresTableProps) {
       },
       cell: ({ row }) => {
         const name: string = row.getValue("name");
-        return <div className="px-4 capitalize">{name}</div>;
+        return <div className="px-3 capitalize">{name}</div>;
       },
     },
     {
@@ -81,10 +82,31 @@ export function AdminStoresTable({ stores }: AdminStoresTableProps) {
         );
       },
       cell: ({ row }) => (
-        <div className="px-4 capitalize">{row.getValue("location")}</div>
+        <div className="px-3 capitalize">{row.getValue("location")}</div>
       ),
     },
+    {
+      accessorKey: "openingTime",
+      header: "Business Hours",
+      cell: ({ row }) => {
+        const { openingTime, closingTime } = row.original;
 
+        const formatTime = (time?: string) => {
+          if (!time) return null;
+          try {
+            const parsed = parse(time, "HH:mm", new Date());
+            return format(parsed, "h:mm a"); // e.g. 8:00 AM
+          } catch {
+            return time; // fallback to raw string if invalid
+          }
+        };
+
+        const open = formatTime(openingTime);
+        const close = formatTime(closingTime);
+
+        return <div>{open && close ? `${open} - ${close}` : "N/A"}</div>;
+      },
+    },
     {
       accessorKey: "createdAt",
       header: ({ column }) => {
@@ -99,7 +121,7 @@ export function AdminStoresTable({ stores }: AdminStoresTableProps) {
         );
       },
       cell: ({ row }) => (
-        <div className="px-4">
+        <div className="px-3">
           {formatDate(new Date(row.getValue("createdAt")), true)}
         </div>
       ),
@@ -132,7 +154,7 @@ export function AdminStoresTable({ stores }: AdminStoresTableProps) {
     },
   });
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 text-nowrap overflow-x-auto">
       <div className="gap-4 grid sm:grid-cols-3 2xl:flex items-center w-full">
         <Input
           placeholder="Filter by firstname..."

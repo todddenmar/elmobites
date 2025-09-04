@@ -5,8 +5,12 @@ import Link from "next/link";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/firebase";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
-import { dbFetchCollectionWhere, dbSetDocument } from "@/lib/firebase/actions";
-import { TUser } from "@/typings";
+import {
+  dbFetchCollection,
+  dbFetchCollectionWhere,
+  dbSetDocument,
+} from "@/lib/firebase/actions";
+import { TProduct, TStore, TUser } from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
 import { ShieldIcon } from "lucide-react";
@@ -15,7 +19,8 @@ import { usePathname } from "next/navigation";
 import AdminMobileMenu from "./admin/AdminMobileMenu";
 
 function Header() {
-  const { setUserData, userData } = useAppStore();
+  const { setUserData, userData, setCurrentStores, setCurrentProducts } =
+    useAppStore();
   const pathname = usePathname();
   const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
   const isAdmin = userData ? adminEmails.includes(userData?.email) : false;
@@ -30,6 +35,34 @@ function Header() {
     });
 
     return () => unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      const res = await dbFetchCollection(DB_COLLECTION.STORES);
+      if (res.status === DB_METHOD_STATUS.ERROR) {
+        console.log(res.message);
+        return;
+      }
+      if (res.data) {
+        const stores = res.data as TStore[];
+        setCurrentStores(stores);
+      }
+    };
+    fetchStores();
+    const fetchProducts = async () => {
+      const res = await dbFetchCollection(DB_COLLECTION.PRODUCTS);
+      if (res.status === DB_METHOD_STATUS.ERROR) {
+        console.log(res.message);
+        return;
+      }
+      if (res.data) {
+        const products = res.data as TProduct[];
+        setCurrentProducts(products);
+      }
+    };
+    fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
