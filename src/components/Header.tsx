@@ -9,9 +9,16 @@ import { dbFetchCollectionWhere, dbSetDocument } from "@/lib/firebase/actions";
 import { TUser } from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
+import { ShieldIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import AdminMobileMenu from "./admin/AdminMobileMenu";
 
 function Header() {
-  const { setUserData } = useAppStore();
+  const { setUserData, userData } = useAppStore();
+  const pathname = usePathname();
+  const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
+  const isAdmin = userData ? adminEmails.includes(userData?.email) : false;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -92,11 +99,29 @@ function Header() {
     }
   };
   return (
-    <div className="flex justify-between items-center gap-4 p-4">
-      <Link href={"/"}>
-        <CompanyLogo />
-      </Link>
-      <GoogleLoginButton />
+    <div>
+      <div
+        className={cn(
+          "flex justify-between items-center gap-4 p-4 max-w-7xl w-full mx-auto",
+          pathname.includes("/admin") ? "max-w-screen" : ""
+        )}
+      >
+        <div className="flex items-center gap-4">
+          {pathname.includes("/admin") ? <AdminMobileMenu /> : null}
+          <Link href={"/"}>
+            <CompanyLogo />
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {isAdmin ? (
+            <Link href={"/admin"}>
+              <ShieldIcon size={18} />
+            </Link>
+          ) : null}
+          <GoogleLoginButton />
+        </div>
+      </div>
     </div>
   );
 }

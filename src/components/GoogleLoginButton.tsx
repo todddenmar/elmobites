@@ -167,12 +167,12 @@ function GoogleLoginButton() {
       ) : (
         <div>
           <Button className="w-full" onClick={() => setIsSignInOpen(true)}>
-            Sign In To Register
+            Sign In
           </Button>
           <Dialog open={isSignInOpen} onOpenChange={setIsSignInOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Welcome to Eventracers</DialogTitle>
+                <DialogTitle>Welcome to The Cake Co.</DialogTitle>
                 <DialogDescription>
                   Please choose how you want to sign in.
                 </DialogDescription>
@@ -189,7 +189,7 @@ function GoogleLoginButton() {
                       setIsSignInOpen(false);
                     }}
                   >
-                    As a Racer
+                    As a Customer
                   </Button>
                 )}
 
@@ -201,7 +201,7 @@ function GoogleLoginButton() {
                       setIsSignInOpen(false);
                     }}
                   >
-                    As an Organizer
+                    As a Admin
                   </Button>
                 </Link>
               </div>

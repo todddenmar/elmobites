@@ -1,5 +1,4 @@
 "use client";
-import SectionTitle from "@/components/custom-ui/SectionTitle";
 import { Button } from "@/components/ui/button";
 import { auth } from "@/firebase";
 import { useAppStore } from "@/lib/store";
@@ -33,10 +32,12 @@ function OrganizerSignInPage() {
   return (
     <div className="h-[600px] w-full flex flex-col items-center justify-center">
       <div className="p-4 rounded-lg bg-white/5 border space-y-4">
-        <SectionTitle>Organizer Sign In</SectionTitle>
-        <p className="text-muted-foreground">
-          Organizers are required to login via google
-        </p>
+        <div>
+          <h4 className="font-semibold text-lg">Admin Sign In</h4>
+          <p className="text-muted-foreground text-sm">
+            Admins are required to login via google
+          </p>
+        </div>
         <Button className="w-full" type="button" onClick={onLogin}>
           Sign In
         </Button>

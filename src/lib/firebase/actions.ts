@@ -11,6 +11,7 @@ import {
   where,
   limit,
   deleteDoc,
+  getCountFromServer,
 } from "firebase/firestore";
 import { DB_METHOD_STATUS } from "../config";
 import {
@@ -287,6 +288,34 @@ export const dbDeleteImageReceipt = async ({ id }: { id: string }) => {
   try {
     await deleteDoc(doc(db, "receipts", id));
     return { status: DB_METHOD_STATUS.SUCCESS };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { status: DB_METHOD_STATUS.ERROR, message: e.message };
+    }
+    return {
+      status: DB_METHOD_STATUS.ERROR,
+      message: "An unknown error occurred",
+    };
+  }
+};
+
+export const dbCountDocuments = async ({
+  collectionName,
+  fieldName,
+  fieldValue,
+  operation = "==",
+}: {
+  collectionName: string;
+  fieldName: string;
+  fieldValue: string | number | boolean | null;
+  operation?: "==" | "!=";
+}) => {
+  try {
+    const coll = collection(db, collectionName);
+    const q = query(coll, where(fieldName, operation, fieldValue));
+    const snapshot = await getCountFromServer(q);
+
+    return { status: DB_METHOD_STATUS.SUCCESS, data: snapshot.data().count };
   } catch (e) {
     if (e instanceof Error) {
       return { status: DB_METHOD_STATUS.ERROR, message: e.message };

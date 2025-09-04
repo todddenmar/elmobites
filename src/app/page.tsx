@@ -1,9 +1,9 @@
-import ContainerLayout from "@/components/custom-ui/ContainerLayout";
+import Banner from "@/components/homepage/Banner";
 
 export default function Home() {
   return (
-    <div>
-      <ContainerLayout>The Cake Co.</ContainerLayout>
+    <div className="flex-1 flex flex-col">
+      <Banner />
     </div>
   );
 }

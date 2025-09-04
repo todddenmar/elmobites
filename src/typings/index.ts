@@ -1,3 +1,6 @@
+import { FieldValue } from "firebase/firestore";
+import { ReactNode } from "react";
+
 export type TPaymentMethod = "E-WALLET" | "CASH" | "BANK_TRANSFER";
 export type TPaymentDetails = {
   id: string;
@@ -45,4 +48,39 @@ export type TTime = {
   hour: string;
   minute: string;
   period: TPeriod;
+};
+
+export type TAdminLink = {
+  id: string;
+  label: string;
+  path: string;
+  icon: ReactNode;
+};
+
+export type TStore = {
+  id: string;
+  slug: string;
+  name: string;
+  location: string;
+  coordinates: string;
+  description: string;
+  thumbnailImage: string | null;
+  images: TMediaFile[];
+  createdAt: string;
+  timestamp: FieldValue | string;
+  isActive?: boolean;
+};
+
+export type TProduct = {
+  id: string;
+  name: string;
+  storeID: string;
+  description: string;
+  thumbnailImage: string;
+  images: TMediaFile[];
+  price: number;
+  tags: string;
+  size: string;
+  createdAt: string;
+  timestamp: FieldValue | string;
 };
