@@ -8,6 +8,7 @@ import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { dbFetchCollectionWhere, dbSetDocument } from "@/lib/firebase/actions";
 import { TUser } from "@/typings";
 import { useAppStore } from "@/lib/store";
+import CompanyLogo from "./CompanyLogo";
 
 function Header() {
   const { setUserData } = useAppStore();
@@ -92,7 +93,9 @@ function Header() {
   };
   return (
     <div className="flex justify-between items-center gap-4 p-4">
-      <Link href={"/"}>Header</Link>
+      <Link href={"/"}>
+        <CompanyLogo />
+      </Link>
       <GoogleLoginButton />
     </div>
   );
