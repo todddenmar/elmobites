@@ -94,13 +94,23 @@ export type TProductVariant = {
   size?: string; // optional (Small, Medium, Large)
 };
 
-export type TStoreInventory = {
+export type TInventory = {
   id: string; // unique inventory record
-  storeID: string; // reference to TStore
-  productID: string; // reference to TProduct
+  productID: string; // reference to TStore
+  branchID: string; // reference to TProduct
   variantID: string; // reference to TProductVariant
   stock: number; // how many available
   updatedAt: string; // ISO date
+  createdAt: string;
+  timestamp: FieldValue | string;
+};
+
+export type TInventoryTableItem = TInventory & {
+  productName: string;
+  branchName: string;
+  variantName: string;
+  categoryName: string;
+  price: number;
 };
 
 export type TProductCategory = {

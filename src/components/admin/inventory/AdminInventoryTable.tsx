@@ -31,15 +31,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "@/lib/utils";
-import { TStore } from "@/typings";
-import StoreActionButton from "./StoreActionButton";
-import { format, parse } from "date-fns";
+import { convertCurrency, formatDate } from "@/lib/utils";
+import { TInventoryTableItem } from "@/typings";
+import InventoryActionButton from "./InventoryActionButton";
 
-type AdminStoresTableProps = {
-  stores: TStore[];
+type AdminInventoryTableProps = {
+  inventoryItems: TInventoryTableItem[];
 };
-export function AdminStoresTable({ stores }: AdminStoresTableProps) {
+export function AdminInventoryTable({
+  inventoryItems,
+}: AdminInventoryTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -49,63 +50,104 @@ export function AdminStoresTable({ stores }: AdminStoresTableProps) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const columns: ColumnDef<TStore>[] = [
+  const columns: ColumnDef<TInventoryTableItem>[] = [
     {
-      accessorKey: "name",
+      id: "name",
+      accessorFn: (row) => `${row.productName} ${row.variantName}`,
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Name
+            Product
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => {
-        const name: string = row.getValue("name");
-        return <div className="px-3 capitalize">{name}</div>;
+        const { productName, variantName } = row.original;
+        return (
+          <div className="px-3">
+            <div>
+              <div>{productName}</div>
+              <div>{variantName}</div>
+            </div>
+          </div>
+        );
       },
     },
     {
-      accessorKey: "location",
+      accessorKey: "price",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Location
+            Price
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="px-3 capitalize">{row.getValue("location")}</div>
+        <div className="px-3 capitalize">
+          {convertCurrency(row.getValue("price"))}
+        </div>
       ),
     },
     {
-      accessorKey: "openingTime",
-      header: "Business Hours",
-      cell: ({ row }) => {
-        const { openingTime, closingTime } = row.original;
-
-        const formatTime = (time?: string) => {
-          if (!time) return null;
-          try {
-            const parsed = parse(time, "HH:mm", new Date());
-            return format(parsed, "h:mm a"); // e.g. 8:00 AM
-          } catch {
-            return time; // fallback to raw string if invalid
-          }
-        };
-
-        const open = formatTime(openingTime);
-        const close = formatTime(closingTime);
-
-        return <div>{open && close ? `${open} - ${close}` : "N/A"}</div>;
+      accessorKey: "stock",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Stock
+            <ArrowUpDown />
+          </Button>
+        );
       },
+      cell: ({ row }) => (
+        <div className="px-3 capitalize">{row.getValue("stock")}</div>
+      ),
+    },
+    {
+      accessorKey: "branchName",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Branch
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="px-3 capitalize">{row.getValue("branchName")}</div>
+      ),
+    },
+    {
+      accessorKey: "updatedAt",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Updated At
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="px-3">
+          {formatDate(new Date(row.getValue("updatedAt")), true)}
+        </div>
+      ),
     },
     {
       accessorKey: "createdAt",
@@ -130,13 +172,13 @@ export function AdminStoresTable({ stores }: AdminStoresTableProps) {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        const storeData = row.original;
-        return <StoreActionButton storeData={storeData} />;
+        const inventoryData = row.original;
+        return <InventoryActionButton inventoryData={inventoryData} />;
       },
     },
   ];
   const table = useReactTable({
-    data: stores || [],
+    data: inventoryItems || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -155,7 +197,7 @@ export function AdminStoresTable({ stores }: AdminStoresTableProps) {
   });
   return (
     <div className="w-full space-y-4 text-nowrap overflow-x-auto">
-      <div className="gap-4 grid sm:grid-cols-3 2xl:flex items-center w-full">
+      <div className="gap-4 flex items-center w-full">
         <Input
           placeholder="Filter by name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}

@@ -10,7 +10,13 @@ import {
   dbFetchCollectionWhere,
   dbSetDocument,
 } from "@/lib/firebase/actions";
-import { TProduct, TProductCategory, TStore, TUser } from "@/typings";
+import {
+  TProduct,
+  TProductCategory,
+  TStore,
+  TInventory,
+  TUser,
+} from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
 import { ShieldIcon } from "lucide-react";
@@ -25,6 +31,7 @@ function Header() {
     setCurrentStores,
     setCurrentProducts,
     setCurrentProductCategories,
+    setCurrentInventory,
   } = useAppStore();
   const pathname = usePathname();
   const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
@@ -80,6 +87,18 @@ function Header() {
       }
     };
     fetchProductCategories();
+    const fetchProductInventory = async () => {
+      const res = await dbFetchCollection(DB_COLLECTION.INVENTORY);
+      if (res.status === DB_METHOD_STATUS.ERROR) {
+        console.log(res.message);
+        return;
+      }
+      if (res.data) {
+        const Inventory = res.data as TInventory[];
+        setCurrentInventory(Inventory);
+      }
+    };
+    fetchProductInventory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

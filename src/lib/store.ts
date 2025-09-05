@@ -3,6 +3,7 @@ import {
   TProduct,
   TProductCategory,
   TStore,
+  TInventory,
   TUser,
 } from "@/typings";
 import { create } from "zustand";
@@ -13,6 +14,7 @@ export type TAppStoreStates = {
   currentStores: TStore[];
   currentProducts: TProduct[];
   currentProductCategories: TProductCategory[];
+  currentInventory: TInventory[];
 };
 
 export type TAppStoreActions = {
@@ -23,6 +25,7 @@ export type TAppStoreActions = {
   setCurrentProductCategories: (
     currentProductCategories: TProductCategory[]
   ) => void;
+  setCurrentInventory: (currentInventory: TInventory[]) => void;
 };
 export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
   (set) => ({
@@ -37,5 +40,8 @@ export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
     currentProductCategories: [],
     setCurrentProductCategories: (currentProductCategories) =>
       set(() => ({ currentProductCategories })),
+    currentInventory: [],
+    setCurrentInventory: (currentInventory) =>
+      set(() => ({ currentInventory })),
   })
 );

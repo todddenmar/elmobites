@@ -165,7 +165,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
     <div className="w-full space-y-4 text-nowrap overflow-x-auto">
       <div className="gap-4 flex items-center w-full">
         <Input
-          placeholder="Filter by firstname..."
+          placeholder="Filter by name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)

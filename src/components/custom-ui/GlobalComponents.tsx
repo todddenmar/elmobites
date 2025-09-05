@@ -1,5 +1,10 @@
 import { TAdminLink } from "@/typings";
-import { CakeIcon, LayoutDashboardIcon, StoreIcon } from "lucide-react";
+import {
+  CakeIcon,
+  FileBoxIcon,
+  LayoutDashboardIcon,
+  StoreIcon,
+} from "lucide-react";
 import React from "react";
 const iconSize = 18;
 
@@ -21,5 +26,11 @@ export const adminLinks: TAdminLink[] = [
     label: "Products",
     path: "/admin/products",
     icon: <CakeIcon size={iconSize} />,
+  },
+  {
+    id: "inventory",
+    label: "Inventory",
+    path: "/admin/inventory",
+    icon: <FileBoxIcon size={iconSize} />,
   },
 ];
