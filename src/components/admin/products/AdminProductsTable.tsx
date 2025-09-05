@@ -36,6 +36,7 @@ import { TProduct } from "@/typings";
 import ProductActionButton from "./ProductActionButton";
 import ProductCategoryTableData from "./table-components/ProductCategoryTableData";
 import ProductVariantsTableData from "./table-components/ProductVariantsTableData";
+import Link from "next/link";
 
 type AdminProductsTableProps = {
   products: TProduct[];
@@ -66,7 +67,11 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
       },
       cell: ({ row }) => {
         const name: string = row.getValue("name");
-        return <div className="px-3 capitalize">{name}</div>;
+        return (
+          <div className="px-3 capitalize">
+            <Link href={`/admin/products/${row.original.id}`}>{name}</Link>
+          </div>
+        );
       },
     },
     {

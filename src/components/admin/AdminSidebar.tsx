@@ -7,7 +7,6 @@ import { adminLinks } from "../custom-ui/GlobalComponents";
 
 function AdminSidebar() {
   const pathname = usePathname();
-
   return (
     <div className="w-[300px] h-full hidden lg:block">
       <div className="h-full p-2 flex flex-col">
@@ -18,7 +17,11 @@ function AdminSidebar() {
                 key={`admin-link-${item.id}`}
                 className={cn(
                   "transition-all duration-150 rounded-lg",
-                  pathname === item.path
+                  item.path === "/admin"
+                    ? pathname === "/admin"
+                      ? "bg-black text-white"
+                      : "hover:bg-black/5"
+                    : pathname.startsWith(item.path)
                     ? "bg-black text-white"
                     : "hover:bg-black/5"
                 )}

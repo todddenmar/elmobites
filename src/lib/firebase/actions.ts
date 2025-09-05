@@ -254,7 +254,7 @@ export const dbUploadMediaByPath = async ({
     const imageRef = ref(storage, path);
     const stringURL = await uploadBytes(imageRef, mediaFile).then(async () => {
       const downloadURL = await getDownloadURL(imageRef);
-      return downloadURL;
+      return downloadURL as string;
     });
     return { status: DB_METHOD_STATUS.SUCCESS, data: stringURL };
   } catch (e) {

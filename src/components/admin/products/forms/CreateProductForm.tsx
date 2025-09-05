@@ -19,17 +19,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppStore } from "@/lib/store";
 import { serverTimestamp } from "firebase/firestore";
 import { toast } from "sonner";
 import SubmitLoadingButtons from "@/components/custom-ui/SubmitLoadingButtons";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { TProduct } from "@/typings";
-import { dbSetDocument } from "@/lib/firebase/actions";
+import { dbCountDocuments, dbSetDocument } from "@/lib/firebase/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
+import _ from "lodash";
 
 // --------------------
 // Schema
@@ -44,6 +45,7 @@ const formSchema = z.object({
   name: z
     .string()
     .min(2, { message: "Product name must be at least 2 characters." }),
+  slug: z.string().min(2, { message: "Slug must be at least 2 characters." }),
   description: z.string().optional(),
   tags: z.string().optional(),
   categoryID: z.string().optional(),
@@ -70,6 +72,7 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
+      slug: "",
       description: "",
       tags: "",
       categoryID: "",
@@ -85,13 +88,34 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
   // --------------------
   // Submit Handler
   // --------------------
+
+  const countSlugExist = async (slugText: string) => {
+    const res = await dbCountDocuments({
+      collectionName: DB_COLLECTION.PRODUCTS,
+      fieldName: "slug",
+      fieldValue: slugText,
+      operation: "==",
+    });
+    if (res.status === DB_METHOD_STATUS.SUCCESS) {
+      return res.data as number;
+    } else {
+      return 0;
+    }
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { name, description, tags, categoryID, variants } = values;
+    const { name, description, tags, categoryID, variants, slug } = values;
     setIsLoading(true);
 
     if (!userData) {
       toast.error("User not logged in");
       setIsLoading(false);
+      return;
+    }
+
+    const totalSlugFound = await countSlugExist(slug);
+    if (totalSlugFound > 0) {
+      toast.error("Slug already exist, please change");
       return;
     }
 
@@ -105,6 +129,7 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
     const newProduct: TProduct = {
       id: crypto.randomUUID(),
       name,
+      slug,
       description: description || "",
       thumbnailImage: "",
       images: [],
@@ -135,7 +160,11 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
     setClose();
     toast.success("Product created successfully");
   }
-
+  const watchName = form.watch("name");
+  useEffect(() => {
+    form.setValue("slug", _.kebabCase(watchName));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchName]);
   // --------------------
   // Render
   // --------------------
@@ -194,7 +223,19 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
                   )}
                 />
               </div>
-
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Slug</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="e.g. product-name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {/* Description */}
               <FormField
                 control={form.control}

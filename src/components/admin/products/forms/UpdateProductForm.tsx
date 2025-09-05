@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppStore } from "@/lib/store";
 import { serverTimestamp } from "firebase/firestore";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ import SubmitLoadingButtons from "@/components/custom-ui/SubmitLoadingButtons";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { TProduct, TProductVariant } from "@/typings";
 import { dbSetDocument } from "@/lib/firebase/actions";
+import _ from "lodash";
 
 // --------------------
 // Schema
@@ -43,6 +44,9 @@ const variantSchema = z.object({
 
 const formSchema = z.object({
   name: z.string().min(2, "Product name must be at least 2 characters."),
+  slug: z.string().min(2, {
+    message: "Slug must be at least 2 characters.",
+  }),
   description: z.string().optional(),
   tags: z.string().optional(),
   categoryID: z.string().optional(),
@@ -70,6 +74,7 @@ export default function UpdateProductForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: product.name,
+      slug: product?.slug || "",
       description: product.description,
       tags: product.tags,
       categoryID: product.categoryID || "none",
@@ -101,6 +106,7 @@ export default function UpdateProductForm({
       const updatedProduct: TProduct = {
         ...product,
         name: values.name,
+        slug: values.slug,
         description: values.description || "",
         tags: values.tags || "",
         categoryID: values.categoryID === "none" ? null : product.categoryID,
@@ -133,7 +139,11 @@ export default function UpdateProductForm({
       setIsLoading(false);
     }
   }
-
+  const watchName = form.watch("name");
+  useEffect(() => {
+    form.setValue("slug", _.kebabCase(watchName));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [watchName]);
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -187,6 +197,19 @@ export default function UpdateProductForm({
               )}
             />
           </div>
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. product-name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {/* Description */}
           <FormField
             control={form.control}

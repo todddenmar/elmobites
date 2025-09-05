@@ -76,6 +76,7 @@ export type TStore = {
 export type TProduct = {
   id: string;
   name: string;
+  slug: string;
   categoryID?: string | null;
   description: string;
   thumbnailImage: string;
