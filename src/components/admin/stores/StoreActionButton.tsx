@@ -12,6 +12,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -44,6 +45,7 @@ function StoreActionButton({ storeData }: StoreActionButtonProps) {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit {storeData.name}</DialogTitle>
+            <DialogDescription>Fill up all required fields</DialogDescription>
           </DialogHeader>
           <UpdateStoreForm store={storeData} setClose={() => setOpen(false)} />
         </DialogContent>

@@ -223,7 +223,7 @@ export default function UpdateProductForm({
             {fields.map((field, index) => (
               <div
                 key={field.id}
-                className="flex items-center gap-2 border p-2 rounded-lg"
+                className="grid md:flex items-center gap-2 border p-2 rounded-lg"
               >
                 {/* Variant Name */}
                 <FormField
@@ -231,8 +231,9 @@ export default function UpdateProductForm({
                   name={`variants.${index}.name`}
                   render={({ field }) => (
                     <FormItem className="flex-1">
+                      <FormLabel className="block md:hidden">Name</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Variant name" />
+                        <Input placeholder="Variant name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -244,9 +245,10 @@ export default function UpdateProductForm({
                   control={form.control}
                   name={`variants.${index}.size`}
                   render={({ field }) => (
-                    <FormItem className="w-32">
+                    <FormItem className="w-full md:w-32">
+                      <FormLabel className="block md:hidden">Size</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Size" />
+                        <Input placeholder="Size" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -258,12 +260,14 @@ export default function UpdateProductForm({
                   control={form.control}
                   name={`variants.${index}.price`}
                   render={({ field }) => (
-                    <FormItem className="w-32">
+                    <FormItem className="w-full md:w-32">
+                      <FormLabel className="block md:hidden">Price</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           step="0.01"
                           {...field}
+                          placeholder="Amount"
                           value={field.value ?? ""}
                           onChange={(e) =>
                             field.onChange(e.target.valueAsNumber)
@@ -286,11 +290,10 @@ export default function UpdateProductForm({
                 </Button>
               </div>
             ))}
-
             <Button
               type="button"
-              variant="secondary"
               onClick={() => append({ name: "", size: "", price: 0 })}
+              variant="secondary"
             >
               + Add Variant
             </Button>

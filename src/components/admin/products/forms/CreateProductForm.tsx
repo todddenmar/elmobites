@@ -145,7 +145,7 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="overflow-y-auto h-[500px] md:h-fit px-2">
             <div className="space-y-4">
-              <div className="flex gap-2">
+              <div className="flex flex-col md:flex-row gap-4 md:gap-2">
                 {/* Product Name */}
                 <div className="flex-1">
                   <FormField
@@ -235,7 +235,7 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
                 {fields.map((field, index) => (
                   <div
                     key={field.id}
-                    className="flex items-center gap-2 border p-2 rounded-lg"
+                    className="grid md:flex items-center gap-2 border p-2 rounded-lg"
                   >
                     {/* Variant Name */}
                     <FormField
@@ -243,6 +243,9 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
                       name={`variants.${index}.name`}
                       render={({ field }) => (
                         <FormItem className="flex-1">
+                          <FormLabel className="block md:hidden">
+                            Name
+                          </FormLabel>
                           <FormControl>
                             <Input placeholder="Variant name" {...field} />
                           </FormControl>
@@ -256,7 +259,10 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
                       control={form.control}
                       name={`variants.${index}.size`}
                       render={({ field }) => (
-                        <FormItem className="w-32">
+                        <FormItem className="w-full md:w-32">
+                          <FormLabel className="block md:hidden">
+                            Size
+                          </FormLabel>
                           <FormControl>
                             <Input placeholder="Size" {...field} />
                           </FormControl>
@@ -270,12 +276,16 @@ function CreateProductForm({ setClose }: CreateProductFormProps) {
                       control={form.control}
                       name={`variants.${index}.price`}
                       render={({ field }) => (
-                        <FormItem className="w-32">
+                        <FormItem className="w-full md:w-32">
+                          <FormLabel className="block md:hidden">
+                            Price
+                          </FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               step="0.01"
                               {...field}
+                              placeholder="Amount"
                               value={field.value ?? ""}
                               onChange={(e) =>
                                 field.onChange(e.target.valueAsNumber)
