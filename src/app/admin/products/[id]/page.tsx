@@ -41,123 +41,144 @@ function AdminProductPage() {
     }
   }, [currentProducts, productID]);
 
-  const onRemove = async () => {
-    if (!product) return;
-    if (!selectedImage) return;
-
-    setIsLoading(true);
-
-    const res = await deleteMediaFromStorage(
-      `products/${product.id}/${selectedImage.id}`
-    );
-    if (res?.status === DB_METHOD_STATUS.ERROR) {
-      console.log(res.message);
-      setIsLoading(false);
-      return;
+const onUpdateThumbnail = async (url: string) => {
+  if (!product) return;
+  const resProduct = await dbUpdateDocument(
+    DB_COLLECTION.PRODUCTS,
+    product.id,
+    {
+      thumbnailImage: url,
     }
-
-    const updated = product?.images.filter((item) => item != selectedImage);
-    const resProduct = await dbUpdateDocument(
-      DB_COLLECTION.PRODUCTS,
-      product.id,
-      {
-        images: updated,
-      }
-    );
-    if (resProduct.status === DB_METHOD_STATUS.ERROR) {
-      console.log(resProduct.message);
-      setIsLoading(false);
-      return;
-    }
-    const updatedProduct = { ...product, images: updated };
-    const updatedProducts = currentProducts.map((item) =>
-      item.id === product.id ? updatedProduct : item
-    );
-    setCurrentProducts(updatedProducts);
-    toast.success("Image removed");
-    setIsOpenConfirm(false);
-    setSelectedImage(null);
-    setIsLoading(false);
-  };
-
-  if (!product) return <EmptyLayout>No Product</EmptyLayout>;
-
-  if (!product) return <EmptyLayout>Product Not Found</EmptyLayout>;
-  return (
-    <div className="flex flex-col gap-4 flex-1 h-full">
-      <div className="flex justify-between items-center">
-        <SectionTitle>{product?.name}</SectionTitle>
-      </div>
-      <div className="grid grid-cols-1 gap-2">
-        <Label>Gallery</Label>
-        {product.images.length === 0 ? (
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-            <Skeleton className="w-full aspect-[3/4] h-full" />
-            <Skeleton className="w-full aspect-[3/4] h-full" />
-            <Skeleton className="w-full aspect-[3/4] h-full" />
-            <Skeleton className="w-full aspect-[3/4] h-full" />
-          </div>
-        ) : null}
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-          {product.images
-            .map((item, idx) => {
-              const key = `prev-image-${idx}`;
-              const url = item.url;
-              return (
-                <div key={key}>
-                  <CarouselImageCard
-                    isHideThumbnail
-                    onClickDelete={() => {
-                      setIsOpenConfirm(true);
-                      setSelectedImage(item);
-                    }}
-                    onClickThumbnail={() => {
-                      console.log("thumbnail clicked");
-                    }}
-                    onClickImage={() => {
-                      console.log("image clicked");
-                    }}
-                    isThumbnail={false}
-                    alt={key}
-                    src={url}
-                  />
-                </div>
-              );
-            })
-            .reverse()}
-        </div>
-        <AddProductMediaDialog product={product} />
-      </div>
-
-      <Dialog open={isOpenConfirm} onOpenChange={setIsOpenConfirm}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete this
-              image.
-            </DialogDescription>
-          </DialogHeader>
-          {isLoading ? (
-            <LoadingComponent />
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                onClick={() => setIsOpenConfirm(false)}
-                type="button"
-                variant={"destructive"}
-              >
-                Cancel
-              </Button>
-              <Button onClick={onRemove} type="button">
-                Confirm
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
   );
+  if (resProduct.status === DB_METHOD_STATUS.ERROR) {
+    console.log(resProduct.message);
+    setIsLoading(false);
+    return;
+  }
+  const updatedProduct = { ...product, thumbnailImage: url };
+  const updatedProducts = currentProducts.map((item) =>
+    item.id === product.id ? updatedProduct : item
+  );
+  setCurrentProducts(updatedProducts);
+  toast.success("Selected as thumbnail");
+};
+
+const onRemove = async () => {
+  if (!product) return;
+  if (!selectedImage) return;
+
+  setIsLoading(true);
+
+  const res = await deleteMediaFromStorage(
+    `products/${product.id}/${selectedImage.id}`
+  );
+  if (res?.status === DB_METHOD_STATUS.ERROR) {
+    console.log(res.message);
+    setIsLoading(false);
+    return;
+  }
+
+  const updated = product?.images.filter((item) => item != selectedImage);
+  const resProduct = await dbUpdateDocument(
+    DB_COLLECTION.PRODUCTS,
+    product.id,
+    {
+      images: updated,
+    }
+  );
+  if (resProduct.status === DB_METHOD_STATUS.ERROR) {
+    console.log(resProduct.message);
+    setIsLoading(false);
+    return;
+  }
+  const updatedProduct = { ...product, images: updated };
+  const updatedProducts = currentProducts.map((item) =>
+    item.id === product.id ? updatedProduct : item
+  );
+  setCurrentProducts(updatedProducts);
+  toast.success("Image removed");
+  setIsOpenConfirm(false);
+  setSelectedImage(null);
+  setIsLoading(false);
+};
+
+if (!product) return <EmptyLayout>No Product</EmptyLayout>;
+
+if (!product) return <EmptyLayout>Product Not Found</EmptyLayout>;
+return (
+  <div className="flex flex-col gap-4 flex-1 h-full">
+    <div className="flex justify-between items-center">
+      <SectionTitle>{product?.name}</SectionTitle>
+    </div>
+    <div className="grid grid-cols-1 gap-2">
+      <Label>Gallery</Label>
+      {product.images.length === 0 ? (
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+          <Skeleton className="w-full aspect-[3/4] h-full" />
+          <Skeleton className="w-full aspect-[3/4] h-full" />
+          <Skeleton className="w-full aspect-[3/4] h-full" />
+          <Skeleton className="w-full aspect-[3/4] h-full" />
+        </div>
+      ) : null}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        {product.images
+          .map((item, idx) => {
+            const key = `prev-image-${idx}`;
+            const url = item.url;
+            return (
+              <div key={key}>
+                <CarouselImageCard
+                  onClickDelete={() => {
+                    setIsOpenConfirm(true);
+                    setSelectedImage(item);
+                  }}
+                  onClickThumbnail={() => {
+                    onUpdateThumbnail(url);
+                  }}
+                  onClickImage={() => {
+                    console.log("image clicked");
+                  }}
+                  isThumbnail={product.thumbnailImage === item.url}
+                  alt={key}
+                  src={url}
+                />
+              </div>
+            );
+          })
+          .reverse()}
+      </div>
+      <AddProductMediaDialog product={product} />
+    </div>
+
+    <Dialog open={isOpenConfirm} onOpenChange={setIsOpenConfirm}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete this
+            image.
+          </DialogDescription>
+        </DialogHeader>
+        {isLoading ? (
+          <LoadingComponent />
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              onClick={() => setIsOpenConfirm(false)}
+              type="button"
+              variant={"destructive"}
+            >
+              Cancel
+            </Button>
+            <Button onClick={onRemove} type="button">
+              Confirm
+            </Button>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  </div>
+);
 }
 
 export default AdminProductPage;

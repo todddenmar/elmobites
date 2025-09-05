@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import localFont from "next/font/local";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,10 @@ export const metadata: Metadata = {
   title: "The Cake Co.",
   description:
     "Order delicious custom cakes online from The Cake Co. Pagadian City. Freshly baked, beautifully designed, and delivered straight to your doorstep.",
+  openGraph: {
+    images: "https://www.cubehostelpagadian.com/images/thumbnail.png",
+  },
+  keywords: ["Cakes", "Pagadian City", "Coffee", "Cafe"],
 };
 
 export default function RootLayout({
@@ -52,6 +57,7 @@ export default function RootLayout({
       <body className="font-sans flex flex-col h-screen">
         <Header />
         <div className="flex-1 flex flex-col">{children}</div>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

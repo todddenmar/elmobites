@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { ShirtIcon, StarIcon, Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import { Button } from "../ui/button";
 
 type CarouselImageCardProps = {
   onClickImage: () => void;
@@ -49,25 +50,27 @@ function CarouselImageCard({
       )}
 
       <div className="absolute bottom-0 top-0 right-0 p-2 flex justify-between flex-col items-center">
-        <button
+        <Button
           type="button"
+          size={"icon"}
           onClick={onClickDelete}
           aria-label="Delete image"
-          className="rounded-full bg-neutral-950/5 text-neutral-500 p-2"
+          className="rounded-full"
         >
           <Trash2Icon size={16} />
-        </button>
+        </Button>
         {isHideThumbnail ? null : (
-          <button
+          <Button
             type="button"
+            size={"icon"}
             aria-label={isThumbnail ? "Thumbnail image" : "Set as thumbnail"}
             onClick={!isThumbnail ? onClickThumbnail : undefined}
           >
             <StarIcon
-              fill={isThumbnail ? "#5ac7ff" : "none"}
+              fill={isThumbnail ? "#fff" : "none"}
               className="text-lightblue"
             />
-          </button>
+          </Button>
         )}
       </div>
     </div>
