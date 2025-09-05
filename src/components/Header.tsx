@@ -10,7 +10,7 @@ import {
   dbFetchCollectionWhere,
   dbSetDocument,
 } from "@/lib/firebase/actions";
-import { TProduct, TStore, TUser } from "@/typings";
+import { TProduct, TProductCategory, TStore, TUser } from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
 import { ShieldIcon } from "lucide-react";
@@ -19,8 +19,13 @@ import { usePathname } from "next/navigation";
 import AdminMobileMenu from "./admin/AdminMobileMenu";
 
 function Header() {
-  const { setUserData, userData, setCurrentStores, setCurrentProducts } =
-    useAppStore();
+  const {
+    setUserData,
+    userData,
+    setCurrentStores,
+    setCurrentProducts,
+    setCurrentProductCategories,
+  } = useAppStore();
   const pathname = usePathname();
   const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
   const isAdmin = userData ? adminEmails.includes(userData?.email) : false;
@@ -63,6 +68,18 @@ function Header() {
       }
     };
     fetchProducts();
+    const fetchProductCategories = async () => {
+      const res = await dbFetchCollection(DB_COLLECTION.PRODUCT_CATEGORIES);
+      if (res.status === DB_METHOD_STATUS.ERROR) {
+        console.log(res.message);
+        return;
+      }
+      if (res.data) {
+        const categories = res.data as TProductCategory[];
+        setCurrentProductCategories(categories);
+      }
+    };
+    fetchProductCategories();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -76,13 +76,36 @@ export type TStore = {
 export type TProduct = {
   id: string;
   name: string;
-  storeID: string;
+  categoryID?: string | null;
   description: string;
   thumbnailImage: string;
   images: TMediaFile[];
   price: number;
   tags: string;
-  size: string;
   createdAt: string;
   timestamp: FieldValue | string;
+  variants: TProductVariant[]; // 👈 variants instead of single price/size
+};
+
+export type TProductVariant = {
+  id: string;
+  name: string; // e.g. "Regular", "Junior"
+  price: number; // e.g. 1350 or 950
+  size?: string; // optional (Small, Medium, Large)
+};
+
+export type TStoreInventory = {
+  id: string; // unique inventory record
+  storeID: string; // reference to TStore
+  productID: string; // reference to TProduct
+  variantID: string; // reference to TProductVariant
+  stock: number; // how many available
+  updatedAt: string; // ISO date
+};
+
+export type TProductCategory = {
+  id: string;
+  name: string;
+  description: string;
+  tags: string;
 };

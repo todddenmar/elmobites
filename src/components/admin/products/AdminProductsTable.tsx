@@ -31,9 +31,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "@/lib/utils";
+import { convertCurrency, formatDate } from "@/lib/utils";
 import { TProduct } from "@/typings";
 import ProductActionButton from "./ProductActionButton";
+import ProductCategoryTableData from "./table-components/ProductCategoryTableData";
+import ProductVariantsTableData from "./table-components/ProductVariantsTableData";
 
 type AdminProductsTableProps = {
   products: TProduct[];
@@ -68,23 +70,51 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
       },
     },
     {
-      accessorKey: "location",
+      accessorKey: "price",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Location
+            Price
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="px-3 capitalize">{row.getValue("location")}</div>
+        <div className="px-3 capitalize">
+          {convertCurrency(row.getValue("price"))}
+        </div>
       ),
     },
-
+    {
+      accessorKey: "variants",
+      header: () => {
+        return <div className="px-4">Variants</div>;
+      },
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <div>
+            <ProductVariantsTableData product={product} />
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "categoryID",
+      header: "Category",
+      cell: ({ row }) => {
+        const categoryID = row.getValue("categoryID") as string | undefined;
+        if (!categoryID) return null;
+        return (
+          <div>
+            <ProductCategoryTableData id={categoryID} />
+          </div>
+        );
+      },
+    },
     {
       accessorKey: "createdAt",
       header: ({ column }) => {
@@ -133,7 +163,7 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
   });
   return (
     <div className="w-full space-y-4 text-nowrap overflow-x-auto">
-      <div className="gap-4 grid sm:grid-cols-3 2xl:flex items-center w-full">
+      <div className="gap-4 flex items-center w-full">
         <Input
           placeholder="Filter by firstname..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}

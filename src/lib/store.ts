@@ -1,4 +1,10 @@
-import { TGoogleUser, TProduct, TStore, TUser } from "@/typings";
+import {
+  TGoogleUser,
+  TProduct,
+  TProductCategory,
+  TStore,
+  TUser,
+} from "@/typings";
 import { create } from "zustand";
 
 export type TAppStoreStates = {
@@ -6,6 +12,7 @@ export type TAppStoreStates = {
   userData: TUser | null;
   currentStores: TStore[];
   currentProducts: TProduct[];
+  currentProductCategories: TProductCategory[];
 };
 
 export type TAppStoreActions = {
@@ -13,6 +20,9 @@ export type TAppStoreActions = {
   setUserData: (userData: TUser | null) => void;
   setCurrentStores: (currentStores: TStore[]) => void;
   setCurrentProducts: (currentProducts: TProduct[]) => void;
+  setCurrentProductCategories: (
+    currentProductCategories: TProductCategory[]
+  ) => void;
 };
 export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
   (set) => ({
@@ -24,5 +34,8 @@ export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
     setCurrentStores: (currentStores) => set(() => ({ currentStores })),
     currentProducts: [],
     setCurrentProducts: (currentProducts) => set(() => ({ currentProducts })),
+    currentProductCategories: [],
+    setCurrentProductCategories: (currentProductCategories) =>
+      set(() => ({ currentProductCategories })),
   })
 );
