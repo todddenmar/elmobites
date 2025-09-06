@@ -10,6 +10,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { ImageIcon } from "lucide-react";
 type ProductVariantsTableDataProps = {
   product: TProduct;
 };
@@ -39,12 +41,30 @@ function ProductVariantsTableData({ product }: ProductVariantsTableDataProps) {
                 return (
                   <li
                     key={`product-variant-${item.id}`}
-                    className="flex justify-between items-center gap-4 border rounded-lg p-4"
+                    className="flex gap-4 border rounded-lg p-2"
                   >
-                    <div>
-                      {item.name} {item.size ? `(${item.size})` : null}
+                    <div className="rounded-lg relative overflow-hidden aspect-square">
+                      {item.thumbnailImage ? (
+                        <Image
+                          src={item.thumbnailImage}
+                          width={50}
+                          height={50}
+                          className="object-cover object-center h-full w-full"
+                          alt={item.name}
+                        />
+                      ) : (
+                        <ImageIcon
+                          size={18}
+                          className="text-muted-foreground"
+                        />
+                      )}
                     </div>
-                    <div>{convertCurrency(item.price)}</div>
+                    <div>
+                      <div>
+                        {item.name} {item.size ? `(${item.size})` : null}
+                      </div>
+                      <div>{convertCurrency(item.price)}</div>
+                    </div>
                   </li>
                 );
               })}

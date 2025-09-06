@@ -79,10 +79,11 @@ export type TProduct = {
   slug: string;
   categoryID?: string | null;
   description: string;
-  thumbnailImage: string;
+  thumbnailImage?: string | null;
   images: TMediaFile[];
   price: number;
   tags: string;
+  isPublished?: boolean;
   createdAt: string;
   timestamp: FieldValue | string;
   variants: TProductVariant[]; // 👈 variants instead of single price/size
@@ -93,6 +94,8 @@ export type TProductVariant = {
   name: string; // e.g. "Regular", "Junior"
   price: number; // e.g. 1350 or 950
   size?: string; // optional (Small, Medium, Large)
+  thumbnailImage?: string | null;
+  imageURLs?: string[];
 };
 
 export type TInventory = {

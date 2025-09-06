@@ -55,7 +55,7 @@ function CarouselImageCard({
           size={"icon"}
           onClick={onClickDelete}
           aria-label="Delete image"
-          className="rounded-full"
+          className="rounded-full cursor-pointer"
         >
           <Trash2Icon size={16} />
         </Button>
@@ -63,6 +63,7 @@ function CarouselImageCard({
           <Button
             type="button"
             size={"icon"}
+            className="cursor-pointer"
             aria-label={isThumbnail ? "Thumbnail image" : "Set as thumbnail"}
             onClick={!isThumbnail ? onClickThumbnail : undefined}
           >

@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
+import { ArrowUpDown, ChevronDown, ImageIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +37,8 @@ import ProductActionButton from "./ProductActionButton";
 import ProductCategoryTableData from "./table-components/ProductCategoryTableData";
 import ProductVariantsTableData from "./table-components/ProductVariantsTableData";
 import Link from "next/link";
+import Image from "next/image";
+import ProductPublishSwitch from "./table-components/ProductPublishSwitch";
 
 type AdminProductsTableProps = {
   products: TProduct[];
@@ -67,8 +69,22 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
       },
       cell: ({ row }) => {
         const name: string = row.getValue("name");
+        const thumbnailImage = row.original.thumbnailImage;
         return (
-          <div className="px-3 capitalize">
+          <div className="px-3 capitalize flex items-center gap-4">
+            <div className="w-[50px] flex flex-col items-center justify-center border aspect-square relative overflow-hidden rounded-lg">
+              {thumbnailImage ? (
+                <Image
+                  src={thumbnailImage}
+                  width={50}
+                  height={50}
+                  className="object-cover object-center"
+                  alt={name}
+                />
+              ) : (
+                <ImageIcon size={18} className="text-muted-foreground" />
+              )}
+            </div>
             <Link href={`/admin/products/${row.original.id}`}>{name}</Link>
           </div>
         );
@@ -116,6 +132,18 @@ export function AdminProductsTable({ products }: AdminProductsTableProps) {
         return (
           <div>
             <ProductCategoryTableData id={categoryID} />
+          </div>
+        );
+      },
+    },
+    {
+      id: "isPublished",
+      header: "Is Published",
+      cell: ({ row }) => {
+        const product = row.original;
+        return (
+          <div>
+            <ProductPublishSwitch product={product} />
           </div>
         );
       },
