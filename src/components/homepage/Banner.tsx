@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 function Banner() {
   return (
@@ -8,13 +9,15 @@ function Banner() {
         <h1 className="font-main text-6xl md:text-8xl lg:text-9xl">
           The Cake Co.
         </h1>
-        <Button
-          size={"lg"}
-          className="rounded-full cursor-pointer"
-          type="button"
-        >
-          Order Now
-        </Button>
+        <Link href={"/products"}>
+          <Button
+            size={"lg"}
+            className="rounded-full cursor-pointer"
+            type="button"
+          >
+            Order Now
+          </Button>
+        </Link>
       </div>
     </div>
   );

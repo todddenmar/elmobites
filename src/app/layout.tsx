@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
+import CustomProgressProvider from "@/components/custom-ui/CustomProgressProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,9 +56,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${dreamAvenue.variable} ${signature.variable} ${bostonAngel.variable} ${montserrat.variable} antialiased`}
     >
       <body className="font-sans flex flex-col h-screen">
-        <Header />
-        <div className="flex-1 flex flex-col">{children}</div>
-        <Toaster position="top-center" />
+        <CustomProgressProvider>
+          <Header />
+          <div className="flex-1 flex flex-col">{children}</div>
+          <Toaster position="top-center" />
+        </CustomProgressProvider>
       </body>
     </html>
   );
