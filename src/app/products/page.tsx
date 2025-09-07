@@ -1,14 +1,21 @@
-import { CardShineEffect } from "@/components/custom-ui/CardShineEffect";
 import ErrorCard from "@/components/custom-ui/ErrorCard";
+import ProductCard from "@/components/products/ProductCard";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import {
   dbFetchCollection,
   dbFetchCollectionWhere,
 } from "@/lib/firebase/actions";
-import { convertCurrency } from "@/lib/utils";
 import { TProduct, TProductCategory } from "@/typings";
 import { Metadata } from "next";
-import Image from "next/image";
+import Link from "next/link";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const getProductsData = async () => {
   let products: TProduct[] = [];
@@ -46,9 +53,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `The Cake Co. Products`,
     description: `Order delicious custom cakes online from The Cake Co. Pagadian City. Freshly baked, beautifully designed, and delivered straight to your doorstep!`,
-    other: {
-      "google-adsense-account": "ca-pub-1826892933379008",
-    },
   };
 }
 
@@ -66,64 +70,36 @@ const ProductsPage = async () => {
     );
   }
   return (
-    <div className="w-full p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 w-full">
-        {products.map((item) => {
-          const category = categories.find((c) => c.id === item.categoryID);
-          return (
-            <div
-              key={`product-item-${item.id}`}
-              className="w-full group border relative p-4 rounded-lg lg:p-8 flex flex-col justify-center"
-            >
-              <div className="relative z-20 max-w-2/3 lg:max-w-sm space-y-2 lg:space-y-4 flex flex-col h-full flex-1 ">
-                <div className="flex-1">
-                  <div className="font-accent uppercase text-2xl leading-5 lg:leading-10 lg:text-5xl">
-                    {item.name}
-                  </div>
-                  {category ? (
-                    <div className="font-signature text-4xl lg:text-6xl -mt-4 ml-5">
-                      {category?.name}
-                    </div>
-                  ) : null}
-                </div>
-                <div className="space-y-4">
-                  <p className="uppercase font-secondary text-xs lg:text-lg">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center flex-wrap gap-2 text-sm lg:text-xl font-secondary font-medium">
-                    {item.variants.map((variant, idx) => {
-                      return (
-                        <div
-                          key={`variant-${variant.id}`}
-                          className="flex items-center gap-2"
-                        >
-                          {idx === 0 ? null : "/"}
-                          <span>
-                            {`${convertCurrency(variant.price)} ${
-                              variant.name
-                            }`}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-              {item.thumbnailImage ? (
-                <div className="absolute right-0 top-0 p-4 w-[150px] h-full lg:w-[200px] z-10">
-                  <CardShineEffect />
-                  <Image
-                    src={item.thumbnailImage}
-                    alt={item.name}
-                    width={400}
-                    height={400}
-                    className="object-cover h-full w-full"
-                  />
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
+    <div>
+      <div className="px-4 py-2 lg:mx-auto lg:max-w-7xl sticky top-0 left-0 right-0 bg-white">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Products</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
+      <div className="w-full p-4 lg:mx-auto lg:max-w-7xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+          {products.map((item) => {
+            const category = categories.find((c) => c.id === item.categoryID);
+            return (
+              <Link
+                key={`product-item-${item.id}`}
+                href={`/products/${item.slug}`}
+              >
+                <ProductCard product={item} category={category || null} />
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
