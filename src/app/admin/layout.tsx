@@ -26,10 +26,12 @@ function AdminRootLayout({
   }
 
   return (
-    <div className="flex flex-1 bg-neutral-50">
+    <div className="flex flex-1 bg-neutral-50 p-4 gap-4">
       <AdminSidebar />
-      <div className="p-0 lg:p-4 flex-1">
-        <div className="p-4 bg-white rounded-lg flex-1 h-full">{children}</div>
+      <div className="flex-1">
+        <div className="p-4 bg-neutral-100 rounded-lg flex-1 h-full">
+          {children}
+        </div>
       </div>
     </div>
   );

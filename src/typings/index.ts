@@ -123,3 +123,40 @@ export type TProductCategory = {
   description: string;
   tags: string;
 };
+
+
+export type TOrderStatus =
+  | "PENDING" // customer placed order, not yet confirmed
+  | "CONFIRMED" // accepted, waiting for preparation
+  | "PREPARING" // being prepared
+  | "READY_FOR_PICKUP" // in-store pickup ready
+  | "OUT_FOR_DELIVERY" // on the way
+  | "COMPLETED" // picked up / delivered successfully
+  | "CANCELLED"; // cancelled by store or customer
+
+export type TOrderItem = {
+  id: string; // unique item id in this order
+  productID: string; // reference to TProduct
+  variantID?: string | null; // reference to TProductVariant if applicable
+  productName: string;
+  variantName?: string | null;
+  quantity: number;
+  price: number; // unit price
+  subtotal: number; // price * quantity
+};
+
+export type TOrder = {
+  id: string;
+  userID: string; // reference to TUser (customer)
+  branchID: string; // reference to TStore
+  items: TOrderItem[]; // list of products in the order
+  totalAmount: number; // sum of all subtotals
+  paymentMethod: TPaymentMethod; // "CASH", "E-WALLET", "BANK_TRANSFER"
+  paymentDetailsID?: string | null; // reference to TPaymentDetails if used
+  receiptImage?: TImageReceipt | null; // uploaded proof of payment
+  status: TOrderStatus;
+  notes?: string; // customer notes (e.g. "Happy Birthday on cake")
+  createdAt: string; // ISO date
+  updatedAt: string;
+  timestamp: FieldValue | string; // Firestore serverTimestamp
+};

@@ -9,7 +9,7 @@ function AdminSidebar() {
   const pathname = usePathname();
   return (
     <div className="w-[300px] h-full hidden lg:block">
-      <div className="h-full p-2 flex flex-col">
+      <div className="h-full flex flex-col">
         <ul>
           {adminLinks.map((item) => {
             return (
