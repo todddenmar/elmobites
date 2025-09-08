@@ -13,8 +13,10 @@ import { useAppStore } from "@/lib/store";
 import { toast } from "sonner";
 import {
   AlertCircleIcon,
+  ClipboardListIcon,
   LoaderIcon,
   LogOutIcon,
+  ShieldIcon,
   UserIcon,
 } from "lucide-react";
 import {
@@ -43,11 +45,14 @@ const isInAppBrowser = () => {
   return /FBAN|FBAV|Instagram/.test(ua);
 };
 function GoogleLoginButton() {
-  const { setGoogleUser, googleUser, setUserData } = useAppStore();
+  const { setGoogleUser, googleUser, setUserData, userData } = useAppStore();
   const router = useRouter();
   const provider = new GoogleAuthProvider();
   const [isLoading, setIsLoading] = useState(true);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
+  const isAdmin = userData ? adminEmails.includes(userData?.email) : false;
+
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -157,6 +162,18 @@ function GoogleLoginButton() {
                 {googleUser.displayName}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              {isAdmin ? (
+                <Link href={"/admin"}>
+                  <DropdownMenuItem>
+                    <ShieldIcon size={18} /> Dashboard
+                  </DropdownMenuItem>{" "}
+                </Link>
+              ) : null}
+              <Link href={"/orders"}>
+                <DropdownMenuItem>
+                  <ClipboardListIcon size={18} /> My Orders
+                </DropdownMenuItem>{" "}
+              </Link>
               <DropdownMenuItem onClick={onLogout}>
                 <LogOutIcon />
                 Logout

@@ -12,6 +12,7 @@ import {
   limit,
   deleteDoc,
   getCountFromServer,
+  getDoc,
 } from "firebase/firestore";
 import { DB_METHOD_STATUS } from "../config";
 import {
@@ -20,6 +21,27 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
+
+export const dbFetchDocument = async <T>(
+  collectionName: string,
+  id: string
+) => {
+  try {
+    const docRef = doc(db, collectionName, id);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      return { status: DB_METHOD_STATUS.ERROR, message: "No data found" }; // No data found
+    }
+
+    return { status: DB_METHOD_STATUS.SUCCESS, data: docSnap.data() as T };
+  } catch (e) {
+    return {
+      status: DB_METHOD_STATUS.ERROR,
+      message: e instanceof Error ? e.message : "An unknown error occurred",
+    };
+  }
+};
 
 export const dbFetchCollection = async <T>(collectionName: string) => {
   try {
@@ -135,24 +157,45 @@ export const dbFetchCollectionWhere2Limit = async <T>({
     };
   }
 };
-
-export const dbFetchCollectionWhere2 = async <T>(
-  collectionName: string,
-  fieldName: string,
-  fieldValue: string | number | boolean | null,
-  operation: "==" | "!=",
-  fieldName2: string,
-  fieldValue2: string | number | boolean | null,
-  operation2: "==" | "!="
-) => {
+// types/firestore.ts
+export type TCollectionWhere2Props = {
+  collectionName: string;
+  where: {
+    fieldName: string;
+    fieldValue: string | number | boolean | null;
+    operation: "==" | "!=";
+  };
+  where2?: {
+    fieldName: string;
+    fieldValue: string | number | boolean | null;
+    operation: "==" | "!=";
+  };
+};
+export const dbFetchCollectionWhere2 = async <T>({
+  collectionName,
+  where: where1,
+  where2,
+}: TCollectionWhere2Props) => {
   try {
-    const q = query(
-      collection(db, collectionName),
-      where(fieldName, operation || "==", fieldValue),
-      where(fieldName2, operation2 || "==", fieldValue2)
-    );
+    // Build query constraints
+    const constraints = [
+      where(where1.fieldName, where1.operation || "==", where1.fieldValue),
+    ];
+
+    if (where2) {
+      constraints.push(
+        where(where2.fieldName, where2.operation || "==", where2.fieldValue)
+      );
+    }
+
+    const q = query(collection(db, collectionName), ...constraints);
+
     const querySnapshot = await getDocs(q);
-    const results: T[] = querySnapshot.docs.map((doc) => doc.data() as T);
+    const results: T[] = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as T[];
+
     return { status: DB_METHOD_STATUS.SUCCESS, data: results };
   } catch (e) {
     return {

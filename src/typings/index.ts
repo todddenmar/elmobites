@@ -159,4 +159,34 @@ export type TOrder = {
   createdAt: string; // ISO date
   updatedAt: string;
   timestamp: FieldValue | string; // Firestore serverTimestamp
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  } | null;
+};
+
+export type TCartItem = {
+  id: string; // unique cart line id
+  productID: string; // reference to TProduct
+  variantID?: string | null; // reference to TProductVariant (if applicable)
+  branchID?: string | null; // reference to TStore branch (optional if multi-branch)
+  name: string; // snapshot of product name
+  variantName?: string; // snapshot of variant name
+  price: number; // snapshot of price at time added
+  quantity: number; // number of items
+  imageURL?: string | null; // snapshot of product image
+  stockAvailable?: number; // optional check against inventory
+  notes?: string; // e.g. "Happy Birthday on top" for cakes
+};
+
+export type TCart = {
+  id: string; // cart/session id
+  userID?: string | null; // logged in user (optional for guest cart)
+  items: TCartItem[];
+  subtotal: number; // sum of item price * qty
+  discounts?: number; // total discounts applied
+  deliveryFee?: number; // optional
+  total: number; // final total (subtotal - discounts + deliveryFee)
+  createdAt: string;
+  updatedAt: string;
 };

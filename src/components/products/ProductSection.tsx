@@ -1,6 +1,12 @@
 "use client";
-import React from "react";
-import { TProduct, TProductCategory } from "@/typings";
+import React, { useEffect, useState } from "react";
+import {
+  TCart,
+  TCartItem,
+  TInventory,
+  TProduct,
+  TProductCategory,
+} from "@/typings";
 import ProductPageGallery from "./ProductPageGallery";
 import { useSearchParams } from "next/navigation";
 import { cn, convertCurrency } from "@/lib/utils";
@@ -16,6 +22,12 @@ import {
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { ShoppingCartIcon } from "lucide-react";
+import { useAppStore } from "@/lib/store";
+import { Label } from "../ui/label";
+import CartButton from "./cart/CartButton";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "@/firebase";
+import { toast } from "sonner";
 type ProductSectionProps = {
   product: TProduct;
   category: TProductCategory | null;
@@ -23,25 +35,137 @@ type ProductSectionProps = {
 };
 function ProductSection({ product, category }: ProductSectionProps) {
   const searchParams = useSearchParams();
+  const { googleUser, customerCart, setCustomerCart, currentStores } =
+    useAppStore();
   const searchQuery = searchParams.get("variant");
   const selectedVariant = searchQuery
     ? product.variants.find((item) => item.id === searchQuery) ||
       product.variants[0]
     : product.variants[0];
 
+  const [inventory, setInventory] = useState<TInventory[]>();
+  const [selectedBranchID, setSelectedBranchID] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+
+  // find selected branch's stock
+  const selectedInventory = inventory?.find(
+    (inv) => inv.branchID === selectedBranchID
+  );
+  const maxStock = selectedInventory?.stock || 0;
+
+  // handlers
+  const increaseQty = () => {
+    setQuantity((prev) => (prev < maxStock ? prev + 1 : prev));
+  };
+  const decreaseQty = () => {
+    setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
+  };
+
+  useEffect(() => {
+    if (currentStores) {
+      if (currentStores[0]) {
+        setSelectedBranchID(currentStores[0].id);
+      }
+    }
+  }, [currentStores]);
+
+  useEffect(() => {
+    const ref = collection(db, "inventory");
+    const q = query(
+      ref,
+      where("productID", "==", product.id),
+      where("variantID", "==", selectedVariant.id)
+    );
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const inventoryItems: TInventory[] = [];
+      querySnapshot.forEach((doc) => {
+        inventoryItems.push(doc.data() as TInventory);
+      });
+
+      setInventory(inventoryItems);
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, [product.id,selectedVariant.id]);
+
+  useEffect(() => {
+    if (quantity > maxStock) {
+      setQuantity(maxStock > 0 ? maxStock : 1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBranchID, maxStock]);
   if (!selectedVariant) {
     return <EmptyLayout>No Variant For this Product</EmptyLayout>;
   }
 
+  const onAddToCart = () => {
+    if (!selectedBranchID || maxStock === 0) return;
+
+    // check if item already exists in cart
+    const existingItemIndex = customerCart?.items.findIndex(
+      (item) =>
+        item.variantID === selectedVariant.id &&
+        item.branchID === selectedBranchID
+    );
+
+    let updatedItems: TCartItem[];
+
+    if (existingItemIndex !== undefined && existingItemIndex > -1) {
+      // item exists -> update quantity
+      updatedItems = customerCart!.items.map((item, idx) =>
+        idx === existingItemIndex
+          ? {
+              ...item,
+              quantity: Math.min(item.quantity + quantity, maxStock), // don’t exceed stock
+            }
+          : item
+      );
+    } else {
+      // item doesn't exist -> add new one
+      const newCartItem: TCartItem = {
+        id: crypto.randomUUID(),
+        productID: product.id,
+        variantID: selectedVariant.id,
+        branchID: selectedBranchID,
+        name: product.name,
+        variantName: selectedVariant.name,
+        quantity,
+        price: selectedVariant.price,
+        stockAvailable: maxStock,
+      };
+
+      updatedItems = customerCart?.items
+        ? [...customerCart.items, newCartItem]
+        : [newCartItem];
+    }
+
+    const newCart: TCart = {
+      id: customerCart?.id || crypto.randomUUID(),
+      userID: googleUser?.uid,
+      createdAt: customerCart?.createdAt || new Date().toISOString(),
+      items: updatedItems,
+      subtotal: updatedItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      ),
+      updatedAt: new Date().toISOString(),
+      total: updatedItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      ),
+    };
+
+    setCustomerCart(newCart);
+    toast.success("Added to cart");
+  };
+
   return (
     <div>
-      <div className="px-4 py-2 lg:mx-auto lg:max-w-7xl sticky top-0 left-0 right-0 bg-white">
+      <div className="px-4 py-2 lg:mx-auto lg:max-w-7xl z-10 sticky top-0 left-0 right-0 bg-white">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
-              </BreadcrumbLink>
+              <BreadcrumbLink>...</BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -90,42 +214,109 @@ function ProductSection({ product, category }: ProductSectionProps) {
                 <div className="text-2xl">
                   {convertCurrency(selectedVariant.price)}
                 </div>
-                <div className="flex items-center flex-wrap gap-4 text-sm lg:text-xl font-secondary font-medium">
-                  {product.variants.map((variant) => {
-                    const isSelected = variant.id === selectedVariant.id;
-                    return (
-                      <Link
-                        key={`variant-${variant.id}`}
-                        href={`/products/${product.slug}?variant=${variant.id}`}
-                      >
+                <div className="space-y-2">
+                  <Label>Size</Label>
+                  <div className="flex items-center flex-wrap gap-4 text-sm lg:text-xl font-secondary font-medium">
+                    {product.variants.map((variant) => {
+                      const isSelected = variant.id === selectedVariant.id;
+                      return (
+                        <Link
+                          key={`variant-${variant.id}`}
+                          href={`/products/${product.slug}?variant=${variant.id}`}
+                        >
+                          <Button
+                            type="button"
+                            className="cursor-pointer"
+                            variant={isSelected ? "default" : "outline"}
+                          >
+                            {variant.name}
+                          </Button>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Branch</Label>
+                  <div className="space-y-2">
+                    {inventory?.map((item) => {
+                      const store = currentStores.find(
+                        (s) => s.id === item.branchID
+                      );
+
+                      if (!store) return null;
+                      const isActive = store.id === selectedBranchID;
+                      return (
                         <Button
                           type="button"
-                          className="cursor-pointer"
-                          variant={isSelected ? "default" : "outline"}
+                          variant={isActive ? "default" : "outline"}
+                          key={`branch-item-${item.id}`}
+                          onClick={() => setSelectedBranchID(item.branchID)}
                         >
-                          {variant.name}
+                          {store.name}
                         </Button>
-                      </Link>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Button
-                    className="w-full cursor-pointer"
-                    type="button"
-                    size={"lg"}
-                    variant={"outline"}
-                  >
-                    <ShoppingCartIcon /> Add To Cart
-                  </Button>
-                  <Button
-                    className="w-full cursor-pointer"
-                    type="button"
-                    size={"lg"}
-                  >
-                    Buy Now
-                  </Button>
+
+                <div className="space-y-2">
+                  <Label>Quantity</Label>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={decreaseQty}
+                    >
+                      -
+                    </Button>
+                    <div className="px-4">{quantity}</div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={increaseQty}
+                    >
+                      +
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {maxStock > 0 ? `${maxStock} in stock` : "Out of stock"}
+                  </p>
                 </div>
+
+                {selectedBranchID ? (
+                  <div className="grid gap-4 sticky bottom-0 py-4 bg-white left-0 right-0 h-fit">
+                    <div className="grid grid-cols-2 gap-4">
+                      <Button
+                        onClick={onAddToCart}
+                        className="w-full cursor-pointer"
+                        type="button"
+                        size={"lg"}
+                        variant={"outline"}
+                      >
+                        <ShoppingCartIcon /> Add To Cart
+                      </Button>
+                      {customerCart ? (
+                        <CartButton isContinue />
+                      ) : (
+                        <Link href={"/checkout"}>
+                          <Button
+                            onClick={onAddToCart}
+                            className="w-full cursor-pointer"
+                            type="button"
+                            size={"lg"}
+                          >
+                            Buy Now
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <EmptyLayout>Select a branch</EmptyLayout>
+                )}
               </div>
             </div>
           </div>

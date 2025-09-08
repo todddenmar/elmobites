@@ -9,7 +9,6 @@ import {
   UserIcon,
 } from "lucide-react";
 import React, { ReactNode } from "react";
-
 function AdminPage() {
   return (
     <div className="flex-1 flex flex-col gap-4 h-full">

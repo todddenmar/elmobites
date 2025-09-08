@@ -19,23 +19,20 @@ import {
 } from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
-import { ShieldIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import AdminMobileMenu from "./admin/AdminMobileMenu";
+import CartButton from "./products/cart/CartButton";
 
 function Header() {
   const {
     setUserData,
-    userData,
     setCurrentStores,
     setCurrentProducts,
     setCurrentProductCategories,
     setCurrentInventory,
   } = useAppStore();
   const pathname = usePathname();
-  const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
-  const isAdmin = userData ? adminEmails.includes(userData?.email) : false;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -183,11 +180,7 @@ function Header() {
         </div>
 
         <div className="flex items-center gap-4">
-          {isAdmin ? (
-            <Link href={"/admin"}>
-              <ShieldIcon size={18} />
-            </Link>
-          ) : null}
+          <CartButton />
           <GoogleLoginButton />
         </div>
       </div>

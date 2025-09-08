@@ -5,12 +5,15 @@ import {
   TStore,
   TInventory,
   TUser,
+  TCart,
 } from "@/typings";
 import { create } from "zustand";
 
 export type TAppStoreStates = {
   googleUser: TGoogleUser | null;
   userData: TUser | null;
+  isOpenCart: boolean;
+  customerCart: TCart | null;
   currentStores: TStore[];
   currentProducts: TProduct[];
   currentProductCategories: TProductCategory[];
@@ -20,6 +23,8 @@ export type TAppStoreStates = {
 export type TAppStoreActions = {
   setGoogleUser: (googleUser: TGoogleUser | null) => void;
   setUserData: (userData: TUser | null) => void;
+  setIsOpenCart: (isOpenCart: boolean) => void;
+  setCustomerCart: (customerCart: TCart | null) => void;
   setCurrentStores: (currentStores: TStore[]) => void;
   setCurrentProducts: (currentProducts: TProduct[]) => void;
   setCurrentProductCategories: (
@@ -33,6 +38,10 @@ export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
     setGoogleUser: (googleUser) => set(() => ({ googleUser })),
     userData: null,
     setUserData: (userData) => set(() => ({ userData })),
+    isOpenCart: false,
+    setIsOpenCart: (isOpenCart) => set(() => ({ isOpenCart })),
+    customerCart: null,
+    setCustomerCart: (customerCart) => set(() => ({ customerCart })),
     currentStores: [],
     setCurrentStores: (currentStores) => set(() => ({ currentStores })),
     currentProducts: [],
