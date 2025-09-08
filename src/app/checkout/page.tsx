@@ -1,8 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import { TypographyH1 } from "@/components/custom-ui/typography";
 import { useAppStore } from "@/lib/store";
 import { convertCurrency } from "@/lib/utils";
@@ -13,6 +11,7 @@ import CartItem from "@/components/products/cart/CartItem";
 import {
   //   TImageReceipt,
   TOrder,
+  TOrderItem,
   //   TOrderItem,
   //   TPaymentDetails,
   //   TPaymentMethod,
@@ -22,36 +21,18 @@ import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
+import dynamic from "next/dynamic";
 
+// ...
+const MapWithMarker = dynamic(
+  () => import("@/components/custom-ui/MapWithMarker"),
+  {
+    ssr: false,
+  }
+);
 const DELIVERY_FEE = 50;
 
 // custom pin icon (Leaflet requires explicit icon)
-const pinIcon = new L.Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-function DraggableMarker({
-  position,
-  setPosition,
-}: {
-  position: [number, number];
-  setPosition: (pos: [number, number]) => void;
-}) {
-  useMapEvents({
-    dragend(e) {
-      const { lat, lng } = e.target.getCenter();
-      setPosition([lat, lng]);
-    },
-    click(e) {
-      setPosition([e.latlng.lat, e.latlng.lng]);
-    },
-  });
-
-  return <Marker position={position} icon={pinIcon} draggable />;
-}
-
 function CheckoutPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -184,18 +165,7 @@ function CheckoutPage() {
         <div className="space-y-4 border-t pt-4">
           <h2 className="font-semibold">Delivery Location</h2>
           {position && (
-            <MapContainer
-              center={position}
-              zoom={16}
-              scrollWheelZoom={false}
-              className="h-64 w-full rounded-lg z-0"
-            >
-              <TileLayer
-                attribution="&copy; OpenStreetMap contributors"
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <DraggableMarker position={position} setPosition={setPosition} />
-            </MapContainer>
+            <MapWithMarker position={position} setPosition={setPosition} />
           )}
           <textarea
             className="w-full border rounded-md p-2 text-sm"

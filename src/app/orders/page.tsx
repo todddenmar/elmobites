@@ -1,6 +1,6 @@
 "use client";
 
-import { TypographyH1 } from "@/components/custom-ui/typography";
+import { TypographyH4 } from "@/components/custom-ui/typography";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import { dbFetchCollectionWhere } from "@/lib/firebase/actions";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { useAppStore } from "@/lib/store";
 
-// Mock fetch - replace with Firestore fetch for logged-in user
 async function fetchOrders(userID: string): Promise<TOrder[]> {
   const res = await dbFetchCollectionWhere({
     collectionName: DB_COLLECTION.ORDERS,
@@ -38,7 +37,7 @@ export default function OrdersPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <TypographyH1>My Orders</TypographyH1>
+      <TypographyH4>My Orders</TypographyH4>
 
       {orders.length === 0 ? (
         <p className="text-muted-foreground">You have no orders yet.</p>
@@ -47,16 +46,14 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <div
               key={order.id}
-              className="border rounded-lg p-4 flex justify-between items-center"
+              className="border text-sm rounded-lg p-4 flex justify-between items-center"
             >
               <div>
-                <p className="font-medium">Order #{order.id}</p>
-                <p className="text-sm text-muted-foreground">
+                <p>Order #{order.id}</p>
+                <p className="text-muted-foreground text-xs">
                   {order.status} • {new Date(order.createdAt).toLocaleString()}
                 </p>
-                <p className="font-semibold mt-1">
-                  ₱{order.totalAmount.toLocaleString()}
-                </p>
+                <p className="mt-1">₱{order.totalAmount.toLocaleString()}</p>
               </div>
               <Button
                 variant="outline"
