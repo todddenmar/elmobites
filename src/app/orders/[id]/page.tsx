@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase";
+import dynamic from "next/dynamic";
 
+// dynamically import map
+const MapWithMarker = dynamic(
+  () => import("@/components/custom-ui/MapWithMarker"),
+  { ssr: false }
+);
 // Mock fetch - replace with Firestore document fetch
 async function fetchOrderById(id: string): Promise<TOrder | null> {
   const res = await dbFetchDocument(DB_COLLECTION.ORDERS, id);
@@ -51,7 +57,7 @@ export default function OrderDetailPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-6 max-w-7xl w-full mx-auto">
       {/* Back Button */}
       <Button
         variant="outline"
@@ -85,7 +91,22 @@ export default function OrderDetailPage() {
           </div>
         ))}
       </div>
-
+      {/* Map if Delivery */}
+      {order.orderType === "DELIVERY" && order.coordinates && (
+        <div className="space-y-4">
+          <TypographyH4>Delivery Location</TypographyH4>
+          <div className="h-64 w-full rounded-lg overflow-hidden">
+            <MapWithMarker
+              position={[
+                order.coordinates.latitude,
+                order.coordinates.longitude,
+              ]}
+              setPosition={() => {}}
+              isMarkerDraggable={false}
+            />
+          </div>
+        </div>
+      )}
       {/* Total */}
       <div className="flex justify-between font-semibold text-lg border-t pt-4">
         <span>Total</span>

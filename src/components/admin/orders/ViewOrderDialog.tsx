@@ -125,6 +125,7 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                     order.coordinates.longitude,
                   ]}
                   setPosition={() => {}}
+                  isMarkerDraggable={false}
                 />
               </div>
             </div>

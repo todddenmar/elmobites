@@ -36,13 +36,13 @@ export default function OrdersPage() {
   }, [googleUser]);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 space-y-6 max-w-7xl w-full mx-auto">
       <TypographyH4>My Orders</TypographyH4>
 
       {orders.length === 0 ? (
         <p className="text-muted-foreground">You have no orders yet.</p>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 w-full md:max-w-sm">
           {orders.map((order) => (
             <div
               key={order.id}

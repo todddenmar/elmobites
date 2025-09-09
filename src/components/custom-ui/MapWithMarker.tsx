@@ -13,9 +13,11 @@ const pinIcon = new L.Icon({
 function DraggableMarker({
   position,
   setPosition,
+  isMarkerDraggable = true,
 }: {
   position: [number, number];
   setPosition: (pos: [number, number]) => void;
+  isMarkerDraggable?: boolean;
 }) {
   useMapEvents({
     click(e) {
@@ -23,15 +25,19 @@ function DraggableMarker({
     },
   });
 
-  return <Marker position={position} icon={pinIcon} draggable />;
+  return (
+    <Marker position={position} icon={pinIcon} draggable={isMarkerDraggable} />
+  );
 }
 
 export default function MapWithMarker({
   position,
   setPosition,
+  isMarkerDraggable,
 }: {
   position: [number, number];
   setPosition: (pos: [number, number]) => void;
+  isMarkerDraggable?: boolean;
 }) {
   return (
     <MapContainer
@@ -44,7 +50,11 @@ export default function MapWithMarker({
         attribution="&copy; OpenStreetMap contributors"
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <DraggableMarker position={position} setPosition={setPosition} />
+      <DraggableMarker
+        position={position}
+        setPosition={setPosition}
+        isMarkerDraggable={isMarkerDraggable}
+      />
     </MapContainer>
   );
 }
