@@ -11,6 +11,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase";
 import dynamic from "next/dynamic";
+import { convertCurrency } from "@/lib/utils";
 
 // dynamically import map
 const MapWithMarker = dynamic(
@@ -18,6 +19,8 @@ const MapWithMarker = dynamic(
   { ssr: false }
 );
 // Mock fetch - replace with Firestore document fetch
+const DELIVERY_FEE = 50;
+
 async function fetchOrderById(id: string): Promise<TOrder | null> {
   const res = await dbFetchDocument(DB_COLLECTION.ORDERS, id);
   if (res.status === DB_METHOD_STATUS.ERROR) {
@@ -75,7 +78,22 @@ export default function OrderDetailPage() {
         <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
         <p>Payment Method: {order.paymentMethod}</p>
       </div>
-
+      {/* Map if Delivery */}
+      {order.orderType === "DELIVERY" && order.coordinates && (
+        <div className="space-y-4">
+          <TypographyH4>Delivery Location</TypographyH4>
+          <div className="h-64 w-full rounded-lg overflow-hidden">
+            <MapWithMarker
+              position={[
+                order.coordinates.latitude,
+                order.coordinates.longitude,
+              ]}
+              setPosition={() => {}}
+              isMarkerDraggable={false}
+            />
+          </div>
+        </div>
+      )}
       {/* Items */}
       <div className="space-y-3 border-t pt-4">
         <TypographyH4>Items</TypographyH4>
@@ -91,20 +109,11 @@ export default function OrderDetailPage() {
           </div>
         ))}
       </div>
-      {/* Map if Delivery */}
-      {order.orderType === "DELIVERY" && order.coordinates && (
-        <div className="space-y-4">
-          <TypographyH4>Delivery Location</TypographyH4>
-          <div className="h-64 w-full rounded-lg overflow-hidden">
-            <MapWithMarker
-              position={[
-                order.coordinates.latitude,
-                order.coordinates.longitude,
-              ]}
-              setPosition={() => {}}
-              isMarkerDraggable={false}
-            />
-          </div>
+
+      {order.orderType === "DELIVERY" && (
+        <div className="flex justify-between text-sm">
+          <span>Delivery Fee</span>
+          <span>{convertCurrency(DELIVERY_FEE)}</span>
         </div>
       )}
       {/* Total */}

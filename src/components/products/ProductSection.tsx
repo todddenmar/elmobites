@@ -238,7 +238,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
                 </div>
                 <div className="space-y-2">
                   <Label>Branch</Label>
-                  <div className="space-y-2">
+                  <div className="space-y-2 flex flex-wrap gap-4">
                     {inventory?.map((item) => {
                       const store = currentStores.find(
                         (s) => s.id === item.branchID
