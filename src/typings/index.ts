@@ -143,6 +143,7 @@ export type TOrderItem = {
   quantity: number;
   price: number; // unit price
   subtotal: number; // price * quantity
+  branchID?: string | null;
 };
 
 export type TOrder = {
@@ -158,6 +159,7 @@ export type TOrder = {
   notes?: string; // customer notes (e.g. "Happy Birthday on cake")
   createdAt: string; // ISO date
   updatedAt: string;
+  orderType: "PICKUP" | "DELIVERY"; // 👈 new field
   timestamp: FieldValue | string; // Firestore serverTimestamp
   coordinates?: {
     latitude: number;

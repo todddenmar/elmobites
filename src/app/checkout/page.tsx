@@ -16,12 +16,16 @@ import {
   //   TPaymentDetails,
   //   TPaymentMethod,
 } from "@/typings";
-import { dbSetDocument } from "@/lib/firebase/actions";
+import {
+  dbSetDocument,
+  dbUpdateDocumentWhereMulti,
+} from "@/lib/firebase/actions";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
 import dynamic from "next/dynamic";
+import { increment } from "firebase/firestore";
 
 // ...
 const MapWithMarker = dynamic(
@@ -78,6 +82,7 @@ function CheckoutPage() {
       quantity: item.quantity,
       price: item.price,
       subtotal: item.price * item.quantity,
+      branchID: item.branchID,
     }));
 
     // build order
@@ -89,6 +94,7 @@ function CheckoutPage() {
       totalAmount: total,
       paymentMethod: "CASH", // you can make this dynamic later
       status: "PENDING",
+      orderType: isDelivery ? "DELIVERY" : "PICKUP",
       notes: isDelivery
         ? `Delivery: ${locationDetails}`
         : locationDetails || undefined,
@@ -116,9 +122,36 @@ function CheckoutPage() {
       setIsLoading(false);
       return;
     }
+
+    await updateInventory(order.items);
+
     setCustomerCart(null);
     toast.success("Order successfully created");
     router.push("/orders/" + order.id);
+  };
+
+  const updateInventory = async (items: TOrderItem[]) => {
+    for (const item of items) {
+      try {
+        const res = await dbUpdateDocumentWhereMulti(
+          DB_COLLECTION.INVENTORY,
+          [
+            { field: "productID", op: "==", value: item.productID },
+            { field: "variantID", op: "==", value: item.variantID },
+            { field: "branchID", op: "==", value: item.branchID },
+          ],
+          {
+            stock: increment(-item.quantity), // 🔥 decrement by order quantity
+          }
+        );
+
+        if (res.status === DB_METHOD_STATUS.ERROR) {
+          console.error("Inventory update failed:", res.message);
+        }
+      } catch (err) {
+        console.error("Inventory update error:", err);
+      }
+    }
   };
 
   if (!customerCart || customerCart.items.length === 0) {

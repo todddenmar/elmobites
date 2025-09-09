@@ -1,37 +1,89 @@
+"use client";
+import RecentOrderItem from "@/components/admin/orders/RecentOrderItem";
 import { TypographyH4 } from "@/components/custom-ui/typography";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { convertCurrency, customDateFormat } from "@/lib/utils";
+import { db } from "@/firebase";
 import {
+  getActiveOrdersCount,
+  getCompletedOrdersToday,
+  getTopProductToday,
+  getTotalSalesToday,
+} from "@/lib/firebase/custom-queries";
+import { useAppStore } from "@/lib/store";
+import { convertCurrency } from "@/lib/utils";
+import { TOrder } from "@/typings";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+  ClipboardCheckIcon,
   ClipboardListIcon,
   PhilippinePesoIcon,
   StarIcon,
-  UserIcon,
 } from "lucide-react";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 function AdminPage() {
+  const { currentActiveOrders, setCurrentActiveOrders } = useAppStore();
+  const [salesToday, setSalesToday] = useState(0);
+  const [totalActive, setTotalActive] = useState(0);
+  const [totalCompleted, setTotalCompleted] = useState(0);
+  const [topProduct, setTopProduct] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ref = collection(db, "orders");
+    const q = query(
+      ref,
+      where("status", "in", [
+        "PENDING",
+        "CONFIRMED",
+        "PREPARING",
+        "READY_FOR_PICKUP",
+        "OUT_FOR_DELIVERY",
+      ])
+    );
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const orders: TOrder[] = [];
+      querySnapshot.forEach((doc) => {
+        orders.push(doc.data() as TOrder);
+      });
+      setCurrentActiveOrders(orders);
+    });
+    return () => unsubscribe(); // Cleanup on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      const sales = await getTotalSalesToday();
+      setSalesToday(sales);
+      const activeOrders = await getActiveOrdersCount();
+      setTotalActive(activeOrders);
+      const completed = await getCompletedOrdersToday();
+      setTotalCompleted(completed);
+      const top = await getTopProductToday();
+      setTopProduct(top);
+    };
+    fetchDashboardData();
+  }, []);
   return (
     <div className="flex-1 flex flex-col gap-4 h-full">
       <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-4">
         <OverviewCard
           title="Total Sales Today"
           icon={<PhilippinePesoIcon className="text-muted-foreground" />}
-          content={convertCurrency(1990)}
+          content={convertCurrency(salesToday)}
         />
         <OverviewCard
-          title="Orders Today"
+          title="Active Orders"
           icon={<ClipboardListIcon className="text-muted-foreground" />}
-          content={3}
+          content={totalActive}
         />
         <OverviewCard
-          title="Customers Today"
-          icon={<UserIcon className="text-muted-foreground" />}
-          content={5}
+          title="Orders Completed Today"
+          icon={<ClipboardCheckIcon className="text-muted-foreground" />}
+          content={totalCompleted}
         />
         <OverviewCard
           title="Top Product Today"
           icon={<StarIcon className="text-muted-foreground" />}
-          content={"Lemon Butter with 3 Orders"}
+          content={topProduct || "none"}
         />
       </div>
 
@@ -40,30 +92,14 @@ function AdminPage() {
           <TypographyH4>Recent Orders</TypographyH4>
           <ScrollArea className="flex-1 border rounded-lg p-2">
             <div className="space-y-2">
-              <div className="border rounded-lg p-2 space-y-2">
-                <div className="flex items-center gap-4 justify-between text-sm">
-                  <div> Order# 1</div>
-                  <Badge>Pick-Up</Badge>
-                </div>
-                <div className="text-sm">
-                  {customDateFormat(new Date(), true)}
-                </div>
-                <div className="bg-orange-300 p-1 rounded-lg text-sm text-center">
-                  PREPARING
-                </div>
-              </div>
-              <div className="border rounded-lg p-2 space-y-2">
-                <div className="flex items-center gap-4 justify-between text-sm">
-                  <div> Order# 2</div>
-                  <Badge variant={"secondary"}>Delivery</Badge>
-                </div>
-                <div className="text-sm">
-                  {customDateFormat(new Date(), true)}
-                </div>
-                <div className="bg-red-300 p-1 rounded-lg text-sm text-center">
-                  PENDING
-                </div>
-              </div>
+              {currentActiveOrders.map((item) => {
+                return (
+                  <RecentOrderItem
+                    key={`active-orders-${item.id}`}
+                    order={item}
+                  />
+                );
+              })}
             </div>
           </ScrollArea>
         </div>

@@ -16,6 +16,7 @@ import {
   TStore,
   TInventory,
   TUser,
+  TOrder,
 } from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
@@ -31,13 +32,21 @@ function Header() {
     setCurrentProducts,
     setCurrentProductCategories,
     setCurrentInventory,
+    setCurrentActiveOrders,
   } = useAppStore();
   const pathname = usePathname();
+  const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         getPrivateData(firebaseUser);
+        const isAdmin = firebaseUser?.email
+          ? adminEmails.includes(firebaseUser?.email)
+          : false;
+        if (isAdmin) {
+          getAdminData();
+        }
       } else {
         setUserData(null);
       }
@@ -98,6 +107,24 @@ function Header() {
     fetchProductInventory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getAdminData = async () => {
+    const res = await dbFetchCollectionWhere({
+      collectionName: DB_COLLECTION.ORDERS,
+      fieldName: "status",
+      fieldValue: "COMPLETED",
+      operation: "!=",
+    });
+    if (res.status === DB_METHOD_STATUS.ERROR) {
+      console.log(res.message);
+      return;
+    }
+    if (res.data) {
+      const activeOrders = res.data as TOrder[];
+      console.log({ activeOrders });
+      setCurrentActiveOrders(activeOrders);
+    }
+  };
 
   const getPrivateData = async (user: User) => {
     if (user?.email) {

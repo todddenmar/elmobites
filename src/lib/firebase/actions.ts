@@ -13,6 +13,7 @@ import {
   deleteDoc,
   getCountFromServer,
   getDoc,
+  WhereFilterOp,
 } from "firebase/firestore";
 import { DB_METHOD_STATUS } from "../config";
 import {
@@ -213,6 +214,43 @@ export const dbUpdateDocument = async <T extends DocumentData>(
   try {
     const userRef = doc(db, collectionName, id);
     await updateDoc(userRef, data);
+    return { status: DB_METHOD_STATUS.SUCCESS };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { status: DB_METHOD_STATUS.ERROR, message: e.message };
+    }
+    return {
+      status: DB_METHOD_STATUS.ERROR,
+      message: "An unknown error occurred",
+    };
+  }
+};
+
+export const dbUpdateDocumentWhereMulti = async (
+  collectionName: string,
+  conditions: { field: string; op: WhereFilterOp; value: unknown }[],
+  data: Record<string, unknown>
+) => {
+  try {
+    const colRef = collection(db, collectionName);
+
+    // build query with multiple wheres
+    let q = query(colRef);
+    conditions.forEach((cond) => {
+      q = query(q, where(cond.field, cond.op, cond.value));
+    });
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return { status: DB_METHOD_STATUS.ERROR, message: "No documents found" };
+    }
+
+    // update all matched docs
+    for (const docSnap of snapshot.docs) {
+      await updateDoc(docSnap.ref, data);
+    }
+
     return { status: DB_METHOD_STATUS.SUCCESS };
   } catch (e) {
     if (e instanceof Error) {
