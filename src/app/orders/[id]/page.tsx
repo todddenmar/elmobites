@@ -8,6 +8,8 @@ import { dbFetchDocument } from "@/lib/firebase/actions";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "lucide-react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/firebase";
 
 // Mock fetch - replace with Firestore document fetch
 async function fetchOrderById(id: string): Promise<TOrder | null> {
@@ -30,6 +32,18 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     if (orderId) fetchOrderById(orderId).then(setOrder);
+  }, [orderId]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      doc(db, DB_COLLECTION.ORDERS, orderId),
+      (docItem) => {
+        console.log("Current data: ", docItem.data());
+        const orderResult = docItem.data() as TOrder;
+        if (orderResult) setOrder(orderResult);
+      }
+    );
+    return () => unsubscribe(); // Cleanup on unmount
   }, [orderId]);
 
   if (!order) {
