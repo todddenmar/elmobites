@@ -8,6 +8,7 @@ import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import {
   dbFetchCollection,
   dbFetchCollectionWhere,
+  dbFetchDocument,
   dbSetDocument,
 } from "@/lib/firebase/actions";
 import {
@@ -17,6 +18,7 @@ import {
   TInventory,
   TUser,
   TOrder,
+  TSettings,
 } from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
@@ -33,6 +35,7 @@ function Header() {
     setCurrentProductCategories,
     setCurrentInventory,
     setCurrentActiveOrders,
+    setCurrentSettings,
   } = useAppStore();
   const pathname = usePathname();
   const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
@@ -57,6 +60,18 @@ function Header() {
   }, []);
 
   useEffect(() => {
+    const fetchSettingsData = async () => {
+      const res = await dbFetchDocument(DB_COLLECTION.SETTINGS, "general");
+      if (res.status === DB_METHOD_STATUS.ERROR) {
+        console.log(res.message);
+        return;
+      }
+      if (res.data) {
+        const settingsData = res.data as TSettings;
+        setCurrentSettings(settingsData);
+      }
+    };
+    fetchSettingsData();
     const fetchStores = async () => {
       const res = await dbFetchCollection(DB_COLLECTION.STORES);
       if (res.status === DB_METHOD_STATUS.ERROR) {

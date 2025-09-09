@@ -7,6 +7,7 @@ import {
   TUser,
   TCart,
   TOrder,
+  TSettings,
 } from "@/typings";
 import { create } from "zustand";
 
@@ -20,6 +21,7 @@ export type TAppStoreStates = {
   currentProductCategories: TProductCategory[];
   currentInventory: TInventory[];
   currentActiveOrders: TOrder[];
+  currentSettings: TSettings;
 };
 
 export type TAppStoreActions = {
@@ -34,6 +36,7 @@ export type TAppStoreActions = {
   ) => void;
   setCurrentInventory: (currentInventory: TInventory[]) => void;
   setCurrentActiveOrders: (currentInventory: TOrder[]) => void;
+  setCurrentSettings: (currentSettings: TSettings) => void;
 };
 export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
   (set) => ({
@@ -58,5 +61,12 @@ export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
     currentActiveOrders: [],
     setCurrentActiveOrders: (currentActiveOrders) =>
       set(() => ({ currentActiveOrders })),
+    currentSettings: {
+      deliveryFee: 50,
+      paymentOptions: [],
+      updatedAt: new Date().toISOString(),
+      images: [],
+    },
+    setCurrentSettings: (currentSettings) => set(() => ({ currentSettings })),
   })
 );

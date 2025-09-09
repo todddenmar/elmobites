@@ -51,6 +51,7 @@ export const DB_COLLECTION = {
   PRODUCT_CATEGORIES: "product_categories",
   INVENTORY: "inventory",
   ORDERS: "orders",
+  SETTINGS: "settings",
 };
 
 export const OPTIONS_HOUR = Array.from({ length: 12 }, (_, index) => {

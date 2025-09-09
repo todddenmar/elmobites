@@ -124,6 +124,18 @@ export type TProductCategory = {
   tags: string;
 };
 
+export type TSettings = {
+  deliveryFee: number;
+  paymentOptions: TPaymentOptionDetails[];
+  updatedAt: string;
+  images?: TMediaFile[] | null;
+};
+export type TPaymentOptionDetails = {
+  id: string;
+  accountName: string;
+  accountNumber: string;
+  providerName: string;
+};
 
 export type TOrderStatus =
   | "PENDING" // customer placed order, not yet confirmed
