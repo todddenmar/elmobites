@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 function OrganizerSignInPage() {
   const { userData } = useAppStore();
-  console.log({ userData });
   const router = useRouter();
   const provider = new GoogleAuthProvider();
   const onLogin = () => {

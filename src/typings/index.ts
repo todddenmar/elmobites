@@ -15,8 +15,6 @@ export type TUser = {
   email: string;
   firstname: string;
   lastname: string;
-  currentEventID?: string | null;
-  clubID?: string;
 };
 
 export type TImageReceipt = {
@@ -155,7 +153,7 @@ export type TOrderItem = {
 
 export type TOrder = {
   id: string;
-  userID: string; // reference to TUser (customer)
+  emailAddress: string; // reference to TUser (customer)
   branchID: string; // reference to TStore
   items: TOrderItem[]; // list of products in the order
   totalAmount: number; // sum of all subtotals
@@ -163,7 +161,6 @@ export type TOrder = {
   paymentDetailsID?: string | null; // reference to TPaymentDetails if used
   receiptImage?: TImageReceipt | null; // uploaded proof of payment
   status: TOrderStatus;
-  notes?: string; // customer notes (e.g. "Happy Birthday on cake")
   createdAt: string; // ISO date
   updatedAt: string;
   orderType: "PICKUP" | "DELIVERY"; // 👈 new field
@@ -172,6 +169,21 @@ export type TOrder = {
     latitude: number;
     longitude: number;
   } | null;
+  customer: TCustomerDetails;
+  payment: {
+    option: TPaymentDetails;
+    referenceNumber: string | null;
+    receiptImage: TImageReceipt | null;
+  };
+  occasion: string | null;
+};
+
+export type TCustomerDetails = {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  email: string;
+  mobileNumber: string;
 };
 
 export type TCartItem = {

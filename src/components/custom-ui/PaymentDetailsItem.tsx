@@ -1,8 +1,7 @@
 import { TPaymentDetails } from "@/typings";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
-import { CopyIcon, EditIcon, QrCodeIcon } from "lucide-react";
-import { toast } from "sonner";
+import { DownloadIcon, EditIcon, QrCodeIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -22,16 +21,21 @@ function PaymentDetailsItem({
   onEdit,
 }: PaymentDetailsItemProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const handleDownload = () => {
+    if (!paymentDetails.qrImageURL) return;
+    const link = document.createElement("a");
+    link.href = paymentDetails.qrImageURL;
+    link.download = `${paymentDetails.accountName}-qr.png`;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
-    <div className="p-2 bg-white/5 rounded-lg items-center flex gap-2">
+    <div className="p-2 bg-black text-white rounded-lg items-center flex gap-2">
       <div className="flex-1 ">
-        <div className="font-semibold text-muted-foreground">
-          {paymentDetails.paymentProvider}
-        </div>
+        <div className="font-semibold">{paymentDetails.paymentProvider}</div>
         <div className="text-sm">{paymentDetails.accountName}</div>
-        <div className="text-muted-foreground text-sm">
-          {paymentDetails.accountNumber}
-        </div>
       </div>
       {paymentDetails.qrImageURL && (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -80,14 +84,11 @@ function PaymentDetailsItem({
       ) : (
         <Button
           type="button"
-          size={"icon"}
+          onClick={handleDownload}
           variant={"secondary"}
-          onClick={() => {
-            navigator.clipboard.writeText(paymentDetails.accountNumber || "");
-            toast.success("Account number copied to clipboard");
-          }}
+          size={"icon"}
         >
-          <CopyIcon />
+          <DownloadIcon />
         </Button>
       )}
     </div>

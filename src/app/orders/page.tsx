@@ -29,8 +29,6 @@ export default function OrdersPage() {
   const { googleUser } = useAppStore();
   const [orders, setOrders] = useState<TOrder[]>([]);
   const router = useRouter();
-  console.log({ googleUser });
-
   useEffect(() => {
     if (googleUser) fetchOrders(googleUser?.uid).then(setOrders);
   }, [googleUser]);

@@ -67,7 +67,8 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
             <TypographyH4>Order Summary</TypographyH4>
             <div>
               <p>
-                <span className="font-medium">Customer:</span> {order.userID}
+                <span className="font-medium">Customer:</span>{" "}
+                {order.customer.fullName}
               </p>
               <p>
                 <span className="font-medium">Payment:</span>{" "}
@@ -77,7 +78,8 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                 <span className="font-medium">Status:</span> {order.status}
               </p>
               <p>
-                <span className="font-medium">Notes:</span> {order.notes || "—"}
+                <span className="font-medium">Occasion:</span>{" "}
+                {order.occasion || "—"}
               </p>
               <p>
                 <span className="font-medium">Total:</span>{" "}

@@ -23,7 +23,12 @@ import {
   dbSetDocument,
   dbUpdateDocumentWhereMulti,
 } from "@/lib/firebase/actions";
-import { DB_COLLECTION, DB_METHOD_STATUS, PAYMENT_OPTION } from "@/lib/config";
+import {
+  DB_COLLECTION,
+  DB_METHOD_STATUS,
+  OCCASIONS,
+  PAYMENT_OPTION,
+} from "@/lib/config";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
@@ -36,6 +41,7 @@ import PaymentOptionSelect from "@/components/custom-ui/PaymentOptionSelect";
 import Link from "next/link";
 import Image from "next/image";
 import PaymentDetailsItem from "@/components/custom-ui/PaymentDetailsItem";
+import { Badge } from "@/components/ui/badge";
 
 // ...
 const MapWithMarker = dynamic(
@@ -44,7 +50,7 @@ const MapWithMarker = dynamic(
     ssr: false,
   }
 );
-const DELIVERY_FEE = 50;
+
 
 // custom pin icon (Leaflet requires explicit icon)
 function CheckoutPage() {
@@ -57,6 +63,7 @@ function CheckoutPage() {
     setGoogleUser,
     currentSettings,
   } = useAppStore();
+const DELIVERY_FEE = currentSettings.deliveryFee;
   const [deliveryOption, setDeliveryOption] = useState<"delivery" | "pickup">(
     "pickup"
   );
@@ -67,6 +74,7 @@ function CheckoutPage() {
   const [lastName, setLastName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
+  const [occasion, setOccasion] = useState("");
   const [email, setEmail] = useState("");
 
   const onLogin = () => {
@@ -143,12 +151,18 @@ function CheckoutPage() {
       setReferenceNumber(
         `${paymentDetails?.accountName} - ${paymentDetails?.accountNumber}`
       );
+    } else {
+      setReferenceNumber("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentOption]);
 
   const onConfirmOrder = async () => {
     if (!customerCart) return;
+    if (!selectedPaymentDetails) {
+      toast.error("Select payment details");
+      return;
+    }
     setIsLoading(true);
     // build order items
     const items: TOrderItem[] = customerCart.items.map((item) => ({
@@ -166,16 +180,27 @@ function CheckoutPage() {
     // build order
     const order: TOrder = {
       id: crypto.randomUUID(),
-      userID: googleUser?.uid || "guest",
+      emailAddress: email,
       branchID: customerCart.items[0]?.branchID ?? "unknown",
       items,
       totalAmount: total,
       paymentMethod: "CASH", // you can make this dynamic later
       status: "PENDING",
       orderType: isDelivery ? "DELIVERY" : "PICKUP",
-      notes: isDelivery
-        ? `Delivery: ${locationDetails}`
-        : locationDetails || undefined,
+      customer: {
+        firstName,
+        lastName,
+        fullName: `${firstName} ${lastName}`,
+        email,
+        mobileNumber,
+      },
+      occasion: occasion || null,
+      // ✅ Add payment details
+      payment: {
+        option: selectedPaymentDetails,
+        referenceNumber: referenceNumber || null,
+        receiptImage: receiptImage || null,
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       timestamp: new Date().toISOString(), // Firestore serverTimestamp later
@@ -240,6 +265,13 @@ function CheckoutPage() {
         </Button>
       );
     }
+    if (!isPagadian && isDelivery) {
+      return (
+        <Button className="w-full" variant={"secondary"} type="button" disabled>
+          Your delivery address is not within Pagadian City
+        </Button>
+      );
+    }
     if (!firstName || !lastName || !mobileNumber) {
       return (
         <Button className="w-full" variant={"secondary"} type="button" disabled>
@@ -247,10 +279,11 @@ function CheckoutPage() {
         </Button>
       );
     }
-    if (!isPagadian && isDelivery) {
+
+    if (paymentOption != "CASH") {
       return (
         <Button className="w-full" variant={"secondary"} type="button" disabled>
-          Your delivery address is not within Pagadian City
+          Reference number required
         </Button>
       );
     }
@@ -340,6 +373,35 @@ function CheckoutPage() {
                 />
               </div>
             )}
+
+            <div className="grid grid-cols-1 gap-2">
+              <Label className="font-semibold text-base">
+                Occasion (Birthday, Wedding, Anniversary…)
+              </Label>
+              <Input
+                value={occasion}
+                placeholder="🎂 What are we celebrating?"
+                onChange={(val) => setOccasion(val.target.value)}
+              />
+              <div className="flex flex-wrap gap-2 mt-2">
+                {OCCASIONS.sort().map((item, idx) => {
+                  return (
+                    <Badge
+                      onClick={() => setOccasion(item)}
+                      key={`occasion-item-${idx}`}
+                      className="cursor-pointer"
+                      variant={
+                        occasion.toLowerCase().includes(item.toLowerCase())
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {item}
+                    </Badge>
+                  );
+                })}
+              </div>
+            </div>
           </div>
           <div className="border rounded-lg p-4 space-y-6 h-fit bg-white">
             <div className="space-y-4">
@@ -408,6 +470,13 @@ function CheckoutPage() {
                         onChange={(val) => setEmail(val.target.value)}
                       />
                     </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      <Label>Email Address</Label>
+                      <Input
+                        value={email}
+                        onChange={(val) => setEmail(val.target.value)}
+                      />
+                    </div>
                   </div>
 
                   <Button
@@ -431,39 +500,40 @@ function CheckoutPage() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label
-                      className={cn(
-                        "",
-                        selectedPaymentDetails === null
-                          ? "text-red-500 animate-pulse"
-                          : ""
-                      )}
-                    >
-                      Select Payment Option
-                    </Label>
-                    {currentSettings?.paymentOptions
-                      ?.filter(
-                        (option) => option.paymentMethod === paymentOption
-                      )
-                      ?.map((item) => {
-                        const isActive = item.id === selectedPaymentDetails?.id;
-                        return (
-                          <div
-                            onClick={() => setSelectedPaymentDetails(item)}
-                            key={`payment-option-item-${item.id}`}
-                            className={cn(
-                              "opacity-50 hover:opacity-100 cursor-pointer border rounded-lg  overflow-hidden transition-all duration-150",
-                              isActive
-                                ? "border-lime-500 opacity-100"
-                                : "hover:border-white/20"
-                            )}
-                          >
-                            <PaymentDetailsItem paymentDetails={item} />
-                          </div>
-                        );
-                      })}
-                  </div>
+                  {paymentOption != "CASH" ? (
+                    <div className="space-y-2">
+                      <Label
+                        className={cn(
+                          "",
+                          selectedPaymentDetails === null
+                            ? "text-red-500 animate-pulse"
+                            : ""
+                        )}
+                      >
+                        Select Payment Option
+                      </Label>
+                      {currentSettings?.paymentOptions
+                        ?.filter(
+                          (option) => option.paymentMethod === paymentOption
+                        )
+                        ?.map((item) => {
+                          const isActive =
+                            item.id === selectedPaymentDetails?.id;
+                          return (
+                            <div
+                              onClick={() => setSelectedPaymentDetails(item)}
+                              key={`payment-option-item-${item.id}`}
+                              className={cn(
+                                "opacity-50 hover:opacity-100 cursor-pointer border rounded-lg  overflow-hidden transition-all duration-150",
+                                isActive ? "opacity-100" : ""
+                              )}
+                            >
+                              <PaymentDetailsItem paymentDetails={item} />
+                            </div>
+                          );
+                        })}
+                    </div>
+                  ) : null}
                   {paymentOption != "CASH" && (
                     <div className="grid grid-cols-1 gap-2">
                       <Label>Upload a screenshot of your payment receipt</Label>
@@ -481,7 +551,7 @@ function CheckoutPage() {
                           >
                             <button
                               type="button"
-                              className="rounded-full  flex mx-auto items-center gap-2 p-2 text-xs text-center"
+                              className="rounded-full hover:underline cursor-pointer flex mx-auto items-center gap-2 p-2 text-xs text-center"
                             >
                               If you&apos;re unable to upload the image, please
                               take a screenshot of your receipt and send it to
@@ -499,37 +569,39 @@ function CheckoutPage() {
                       </div>
                     </div>
                   )}
-                  <div className="grid grid-cols-1 gap-2">
-                    <Label>Reference Number</Label>
-                    <Input
-                      value={referenceNumber}
-                      onChange={(val) => setReferenceNumber(val.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {/* Summary */}
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal</span>
-                    <span>{convertCurrency(customerCart.subtotal)}</span>
-                  </div>
-                  {isDelivery && (
-                    <div className="flex justify-between text-sm">
-                      <span>Delivery Fee</span>
-                      <span>{convertCurrency(DELIVERY_FEE)}</span>
+                  {paymentOption != "CASH" ? (
+                    <div className="grid grid-cols-1 gap-2">
+                      <Label>Reference Number</Label>
+                      <Input
+                        value={referenceNumber}
+                        onChange={(val) => setReferenceNumber(val.target.value)}
+                      />
                     </div>
-                  )}
-                  <div className="flex justify-between font-medium text-lg">
-                    <span>Total</span>
-                    <span>{convertCurrency(total)}</span>
-                  </div>
+                  ) : null}
                 </div>
-
-                {/* Actions */}
-                {renderButtons()}
               </div>
             ) : null}
+
+            {/* Summary */}
+            <div className="border-t pt-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Subtotal</span>
+                <span>{convertCurrency(customerCart.subtotal)}</span>
+              </div>
+              {isDelivery && (
+                <div className="flex justify-between text-sm">
+                  <span>Delivery Fee</span>
+                  <span>{convertCurrency(DELIVERY_FEE)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-medium text-lg">
+                <span>Total</span>
+                <span>{convertCurrency(total)}</span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            {renderButtons()}
           </div>
         </div>
       </div>

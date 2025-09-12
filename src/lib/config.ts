@@ -150,3 +150,26 @@ export const PH_PROVINCES: string[] = [
   "Zamboanga del Sur",
   "Zamboanga Sibugay",
 ];
+
+export const OCCASIONS = [
+  "Birthday",
+  "Anniversary",
+  "Wedding",
+  "Engagement",
+  "Graduation",
+  "Christening",
+  "Baby Shower",
+  "Gender Reveal",
+  "Retirement",
+  "Housewarming",
+  "Promotion",
+  "Valentine's Day",
+  "Mother's Day",
+  "Father's Day",
+  "Christmas",
+  "New Year",
+  "Easter",
+  "Halloween",
+  "Thanksgiving",
+  "Just Because",
+];

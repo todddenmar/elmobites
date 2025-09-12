@@ -136,7 +136,6 @@ function Header() {
     }
     if (res.data) {
       const activeOrders = res.data as TOrder[];
-      console.log({ activeOrders });
       setCurrentActiveOrders(activeOrders);
     }
   };
@@ -151,10 +150,8 @@ function Header() {
       });
       if (userResult.status === DB_METHOD_STATUS.SUCCESS) {
         console.log("get user results");
-        console.log({ userResult });
         if (userResult.data) {
           console.log("get user  data");
-          // getEventRaceCategories({ eventID: userResult.data.currentEventID });
           const userData = userResult.data[0] as TUser;
           if (!userData) {
             createNewUser({
@@ -170,7 +167,6 @@ function Header() {
             email: userData.email,
             firstname: userData.firstname,
             lastname: userData.lastname,
-            currentEventID: userData.currentEventID,
           });
         }
       }

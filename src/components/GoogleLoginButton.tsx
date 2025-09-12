@@ -169,11 +169,13 @@ function GoogleLoginButton() {
                   </DropdownMenuItem>{" "}
                 </Link>
               ) : null}
-              <Link href={"/orders"}>
-                <DropdownMenuItem>
-                  <ClipboardListIcon size={18} /> My Orders
-                </DropdownMenuItem>{" "}
-              </Link>
+              {googleUser.email != "No Email" ? (
+                <Link href={"/orders"}>
+                  <DropdownMenuItem>
+                    <ClipboardListIcon size={18} /> My Orders
+                  </DropdownMenuItem>{" "}
+                </Link>
+              ) : null}
               <DropdownMenuItem onClick={onLogout}>
                 <LogOutIcon />
                 Logout

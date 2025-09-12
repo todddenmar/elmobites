@@ -12,14 +12,14 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase";
 import dynamic from "next/dynamic";
 import { convertCurrency } from "@/lib/utils";
+import Image from "next/image";
+import { useAppStore } from "@/lib/store";
 
 // dynamically import map
 const MapWithMarker = dynamic(
   () => import("@/components/custom-ui/MapWithMarker"),
   { ssr: false }
 );
-// Mock fetch - replace with Firestore document fetch
-const DELIVERY_FEE = 50;
 
 async function fetchOrderById(id: string): Promise<TOrder | null> {
   const res = await dbFetchDocument(DB_COLLECTION.ORDERS, id);
@@ -38,7 +38,8 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const orderId = params?.id as string;
   const [order, setOrder] = useState<TOrder | null>(null);
-
+  const { currentStores, currentSettings } = useAppStore();
+  const DELIVERY_FEE = currentSettings.deliveryFee;
   useEffect(() => {
     if (orderId) fetchOrderById(orderId).then(setOrder);
   }, [orderId]);
@@ -52,7 +53,7 @@ export default function OrderDetailPage() {
         if (orderResult) setOrder(orderResult);
       }
     );
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, [orderId]);
 
   if (!order) {
@@ -71,55 +72,116 @@ export default function OrderDetailPage() {
       </Button>
       <TypographyH4>Order #{order.id}</TypographyH4>
 
-      <div className="text-sm">
-        <p>
-          Status: <span className="font-medium">{order.status}</span>
-        </p>
-        <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
-        <p>Payment Method: {order.paymentMethod}</p>
-      </div>
-      {/* Map if Delivery */}
-      {order.orderType === "DELIVERY" && order.coordinates && (
-        <div className="space-y-4">
-          <TypographyH4>Delivery Location</TypographyH4>
-          <div className="h-64 w-full rounded-lg overflow-hidden">
-            <MapWithMarker
-              position={[
-                order.coordinates.latitude,
-                order.coordinates.longitude,
-              ]}
-              setPosition={() => {}}
-              isMarkerDraggable={false}
-            />
+      {/* Responsive layout */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* LEFT: Order Info */}
+        <div className="flex-1 space-y-6 border p-4 rounded-lg">
+          <div className="text-sm">
+            <p>
+              Status: <span className="font-medium">{order.status}</span>
+            </p>
+            <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
+            <p>Payment Method: {order.paymentMethod}</p>
           </div>
-        </div>
-      )}
-      {/* Items */}
-      <div className="space-y-3 border-t pt-4">
-        <TypographyH4>Items</TypographyH4>
-        {order.items.map((item: TOrderItem) => (
-          <div
-            key={item.id}
-            className="flex justify-between border-b py-2 text-sm"
-          >
-            <span>
-              {item.productName} × {item.quantity}
-            </span>
-            <span>₱{item.subtotal.toLocaleString()}</span>
-          </div>
-        ))}
-      </div>
 
-      {order.orderType === "DELIVERY" && (
-        <div className="flex justify-between text-sm">
-          <span>Delivery Fee</span>
-          <span>{convertCurrency(DELIVERY_FEE)}</span>
+          {/* Map if Delivery */}
+          {order.orderType === "DELIVERY" && order.coordinates && (
+            <div className="space-y-4">
+              <TypographyH4>Delivery Location</TypographyH4>
+              <div className="h-64 w-full rounded-lg overflow-hidden">
+                <MapWithMarker
+                  position={[
+                    order.coordinates.latitude,
+                    order.coordinates.longitude,
+                  ]}
+                  setPosition={() => {}}
+                  isMarkerDraggable={false}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Items */}
+          <div className="space-y-3 border-t pt-4">
+            <TypographyH4>Items</TypographyH4>
+            {order.items.map((item: TOrderItem) => {
+              const store = currentStores.find((s) => s.id === item.branchID);
+              return (
+                <div
+                  key={`order-item${item.id}`}
+                  className="flex justify-between items-center border-b py-2 relative"
+                >
+                  <div className="flex flex-col w-full">
+                    <span className="text-xs">{store?.name}</span>
+                    <span className="font-medium">{item.productName}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {item.variantName} x {item.quantity}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    {convertCurrency(item.subtotal)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {order.orderType === "DELIVERY" && (
+            <div className="flex justify-between text-sm">
+              <span>Delivery Fee</span>
+              <span>{convertCurrency(DELIVERY_FEE)}</span>
+            </div>
+          )}
+
+          {/* Total */}
+          <div className="flex justify-between text-lg border-t pt-4">
+            <span>Total</span>
+            <span>₱{order.totalAmount.toLocaleString()}</span>
+          </div>
         </div>
-      )}
-      {/* Total */}
-      <div className="flex justify-between font-semibold text-lg border-t pt-4">
-        <span>Total</span>
-        <span>₱{order.totalAmount.toLocaleString()}</span>
+
+        {/* RIGHT: Customer + Payment */}
+        <div className="space-y-6 lg:max-w-sm w-full">
+          {/* Customer Details */}
+          <div className="border rounded-lg p-4 space-y-2 text-sm">
+            <TypographyH4>Customer Details</TypographyH4>
+            <p>
+              <span className="font-medium">Name:</span>{" "}
+              {order.customer?.fullName || "N/A"}
+            </p>
+            <p>
+              <span className="font-medium">Email:</span>{" "}
+              {order.customer?.email || "N/A"}
+            </p>
+            <p>
+              <span className="font-medium">Mobile:</span>{" "}
+              {order.customer?.mobileNumber || "N/A"}
+            </p>
+          </div>
+
+          {/* Payment Details */}
+          <div className="border rounded-lg p-4 space-y-2 text-sm">
+            <TypographyH4>Payment Details</TypographyH4>
+            <p>
+              <span className="font-medium">Method:</span> {order.paymentMethod}
+            </p>
+            <p>
+              <span className="font-medium">Reference:</span>{" "}
+              {order.payment?.referenceNumber || "N/A"}
+            </p>
+            {order.payment?.receiptImage && (
+              <div>
+                <span className="font-medium">Receipt:</span>
+                <Image
+                  src={order.payment.receiptImage.url}
+                  alt="Receipt"
+                  width={400}
+                  height={400}
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
