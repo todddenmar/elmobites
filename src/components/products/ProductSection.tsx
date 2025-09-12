@@ -268,7 +268,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
                 </div>
                 <div className="space-y-2">
                   <Label>Size</Label>
-                  <div className="flex items-center flex-wrap gap-4 text-sm lg:text-xl font-secondary font-medium">
+                  <div className="flex items-center flex-wrap gap-2 lg:gap-4 text-sm lg:text-xl font-secondary font-medium">
                     {product.variants.map((variant) => {
                       const isSelected = variant.id === selectedVariant.id;
                       return (
@@ -290,7 +290,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
                 </div>
                 <div className="space-y-2">
                   <Label>Branch</Label>
-                  <div className="space-y-2 flex flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-2 lg:gap-4">
                     {inventory?.map((item) => {
                       const store = currentStores.find(
                         (s) => s.id === item.branchID
