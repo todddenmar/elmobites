@@ -76,6 +76,7 @@ function CheckoutPage() {
   const [referenceNumber, setReferenceNumber] = useState("");
   const [occasion, setOccasion] = useState("");
   const [email, setEmail] = useState("");
+  const [isLoadingLogin, setIsLoadingLogin] = useState(false);
 
   const onLogin = () => {
     if (!firstName || !lastName) {
@@ -90,6 +91,8 @@ function CheckoutPage() {
       toast.error("Mobile number required");
       return;
     }
+    setIsLoadingLogin(true);
+
     const auth = getAuth();
     signInAnonymously(auth)
       .then((userCredential) => {
@@ -102,11 +105,13 @@ function CheckoutPage() {
           photoURL: null,
         });
         toast.success("You are now signed in!");
+        setIsLoadingLogin(false);
       })
       .catch((error) => {
         const errorMessage = error.message;
         toast.error(errorMessage);
         // ...
+        setIsLoadingLogin(false);
       });
   };
   const [paymentOption, setPaymentOption] = useState<TPaymentMethod>(
@@ -227,10 +232,9 @@ function CheckoutPage() {
     }
 
     await updateInventory(order.items);
-
-    setCustomerCart(null);
     toast.success("Order successfully created");
     router.push("/orders/" + order.id);
+    setCustomerCart(null);
   };
 
   const updateInventory = async (items: TOrderItem[]) => {
@@ -321,8 +325,8 @@ function CheckoutPage() {
       <div className="p-4 space-y-4 max-w-7xl w-full mx-auto">
         <TypographyH1>Checkout</TypographyH1>
 
-        <div className="grid lg:grid-cols-2 gap-4">
-          <div className="w-full space-y-4 border rounded-lg p-4 h-fit bg-white">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="w-full flex-1 space-y-4 border rounded-lg p-4 h-fit bg-white">
             {/* Cart Items */}
             <TypographyH4>Order Details</TypographyH4>
             <div className="space-y-4">
@@ -403,12 +407,12 @@ function CheckoutPage() {
               </div>
             </div>
           </div>
-          <div className="border rounded-lg p-4 space-y-6 h-fit bg-white">
+          <div className="border rounded-lg p-4 space-y-6 h-fit bg-white w-full lg:max-w-sm">
             <div className="space-y-4">
               <TypographyH4>Payment Details</TypographyH4>
               {googleUser ? (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="grid grid-cols-1 gap-2">
                       <Label>First Name</Label>
                       <Input
@@ -441,7 +445,7 @@ function CheckoutPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     <div className="grid grid-cols-1 gap-2">
                       <Label>First Name</Label>
                       <Input
@@ -479,13 +483,17 @@ function CheckoutPage() {
                     </div>
                   </div>
 
-                  <Button
-                    className="cursor-pointer"
-                    type="button"
-                    onClick={onLogin}
-                  >
-                    Confirm Customer Details
-                  </Button>
+                  {isLoadingLogin ? (
+                    <LoadingComponent />
+                  ) : (
+                    <Button
+                      className="cursor-pointer"
+                      type="button"
+                      onClick={onLogin}
+                    >
+                      Confirm Customer Details
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

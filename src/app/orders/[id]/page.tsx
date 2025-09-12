@@ -75,13 +75,19 @@ export default function OrderDetailPage() {
       {/* Responsive layout */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* LEFT: Order Info */}
-        <div className="flex-1 space-y-6 border p-4 rounded-lg">
-          <div className="text-sm">
+        <div className="flex-1 space-y-6 border p-4 rounded-lg h-fit">
+          <div className="text-sm space-y-2">
             <p>
-              Status: <span className="font-medium">{order.status}</span>
+              <span className="font-medium">Status:</span>{" "}
+              <span>{order.status}</span>
             </p>
-            <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
-            <p>Payment Method: {order.paymentMethod}</p>
+            <p>
+              <span className="font-medium">Date:</span>{" "}
+              {new Date(order.createdAt).toLocaleString()}
+            </p>
+            <p>
+              <span className="font-medium">Order Type:</span> {order.orderType}
+            </p>
           </div>
 
           {/* Map if Delivery */}
@@ -170,7 +176,7 @@ export default function OrderDetailPage() {
               {order.payment?.referenceNumber || "N/A"}
             </p>
             {order.payment?.receiptImage && (
-              <div>
+              <div className="flex flex-col gap-2">
                 <span className="font-medium">Receipt:</span>
                 <Image
                   src={order.payment.receiptImage.url}
