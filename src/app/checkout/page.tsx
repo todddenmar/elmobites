@@ -30,6 +30,7 @@ import {
   PAYMENT_OPTION,
 } from "@/lib/config";
 import { toast } from "sonner";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
 import dynamic from "next/dynamic";
@@ -43,6 +44,7 @@ import Image from "next/image";
 import PaymentDetailsItem from "@/components/custom-ui/PaymentDetailsItem";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertTriangleIcon } from "lucide-react";
 
 // ...
 const MapWithMarker = dynamic(
@@ -264,31 +266,37 @@ function CheckoutPage() {
   const renderButtons = () => {
     if (!googleUser) {
       return (
-        <Button className="w-full" variant={"secondary"} type="button" disabled>
-          Please confirm your customer details
-        </Button>
+        <Alert variant="destructive">
+          <AlertTriangleIcon />
+          <AlertTitle>Please confirm your customer details</AlertTitle>
+        </Alert>
       );
     }
     if (!isPagadian && isDelivery) {
       return (
-        <Button className="w-full" variant={"secondary"} type="button" disabled>
-          Your delivery address is not within Pagadian City
-        </Button>
+        <Alert variant="destructive">
+          <AlertTriangleIcon />
+          <AlertTitle>
+            Your delivery address is not within Pagadian City
+          </AlertTitle>
+        </Alert>
       );
     }
     if (!firstName || !lastName || !mobileNumber) {
       return (
-        <Button className="w-full" variant={"secondary"} type="button" disabled>
-          Please complete your customer details
-        </Button>
+        <Alert variant="destructive">
+          <AlertTriangleIcon />
+          <AlertTitle> Please complete your customer details</AlertTitle>
+        </Alert>
       );
     }
 
     if (paymentOption != "CASH" && !referenceNumber) {
       return (
-        <Button className="w-full" variant={"secondary"} type="button" disabled>
-          Reference number required
-        </Button>
+        <Alert variant="destructive">
+          <AlertTriangleIcon />
+          <AlertTitle>Reference number required</AlertTitle>
+        </Alert>
       );
     }
 
@@ -298,11 +306,7 @@ function CheckoutPage() {
           <LoadingComponent />
         ) : (
           <div className="flex justify-end">
-            <Button
-              onClick={onConfirmOrder}
-              size="lg"
-              className="w-full sm:w-auto"
-            >
+            <Button onClick={onConfirmOrder} size="lg" className="w-full">
               Confirm Order ({isDelivery ? "Delivery" : "Pick-up"})
             </Button>
           </div>
@@ -609,7 +613,9 @@ function CheckoutPage() {
             </div>
 
             {/* Actions */}
-            {renderButtons()}
+            <div className="bg-white sticky lg:relative bottom-4 rounded-lg left-0 right-0 w-full">
+              {renderButtons()}
+            </div>
           </div>
         </div>
       </div>
