@@ -280,7 +280,7 @@ const DELIVERY_FEE = currentSettings.deliveryFee;
       );
     }
 
-    if (paymentOption != "CASH") {
+    if (paymentOption != "CASH" && !referenceNumber) {
       return (
         <Button className="w-full" variant={"secondary"} type="button" disabled>
           Reference number required
