@@ -42,6 +42,7 @@ import Link from "next/link";
 import Image from "next/image";
 import PaymentDetailsItem from "@/components/custom-ui/PaymentDetailsItem";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 
 // ...
 const MapWithMarker = dynamic(
@@ -50,7 +51,6 @@ const MapWithMarker = dynamic(
     ssr: false,
   }
 );
-
 
 // custom pin icon (Leaflet requires explicit icon)
 function CheckoutPage() {
@@ -63,7 +63,7 @@ function CheckoutPage() {
     setGoogleUser,
     currentSettings,
   } = useAppStore();
-const DELIVERY_FEE = currentSettings.deliveryFee;
+  const DELIVERY_FEE = currentSettings.deliveryFee;
   const [deliveryOption, setDeliveryOption] = useState<"delivery" | "pickup">(
     "pickup"
   );
@@ -364,8 +364,8 @@ const DELIVERY_FEE = currentSettings.deliveryFee;
                     setPosition={setPosition}
                   />
                 )}
-                <textarea
-                  className="w-full border rounded-md p-2 text-sm"
+                <Textarea
+                  className="w-full border rounded-md p-2 text-sm resize-none"
                   rows={3}
                   placeholder="Add more details (house number, landmarks, etc.)"
                   value={locationDetails}
