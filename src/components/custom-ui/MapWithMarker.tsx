@@ -1,8 +1,15 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useEffect } from "react";
 
 const pinIcon = new L.Icon({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -26,10 +33,26 @@ function DraggableMarker({
   });
 
   return (
-    <Marker position={position} icon={pinIcon} draggable={isMarkerDraggable} />
+    <div>
+      <Marker
+        position={position}
+        icon={pinIcon}
+        draggable={isMarkerDraggable}
+      />
+      <RecenterMap position={position} />
+    </div>
   );
 }
-
+// 👇 helper to recenter the map
+function RecenterMap({ position }: { position: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    if (position) {
+      map.setView(position, 16); // zoom 16
+    }
+  }, [position, map]);
+  return null;
+}
 export default function MapWithMarker({
   position,
   setPosition,

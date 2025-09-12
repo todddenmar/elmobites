@@ -12,15 +12,18 @@ import {
 } from "@/components/ui/dialog";
 import ViewOrderDialog from "./ViewOrderDialog";
 import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/lib/store";
 type RecentOrderItemProps = {
   order: TOrder;
 };
 function RecentOrderItem({ order }: RecentOrderItemProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { currentStores } = useAppStore();
+  const branch = currentStores.find((item) => item.id === order.branchID);
   return (
     <div className="border rounded-lg p-2 space-y-2">
       <div className="flex items-center gap-4 justify-between text-sm">
-        <div>Order# {order.id}</div>
+        <div>{branch?.name}</div>
         <Badge>{order.orderType}</Badge>
       </div>
       <div className="text-sm">
@@ -32,7 +35,9 @@ function RecentOrderItem({ order }: RecentOrderItemProps) {
         </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button type="button">View Order</Button>
+            <Button type="button" variant={"secondary"}>
+              View Order
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader hidden>

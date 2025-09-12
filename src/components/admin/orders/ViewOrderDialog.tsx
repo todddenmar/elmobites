@@ -11,6 +11,8 @@ import { convertCurrency } from "@/lib/utils";
 import { dbUpdateDocument } from "@/lib/firebase/actions";
 import { useAppStore } from "@/lib/store";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 // dynamically import map
 const MapWithMarker = dynamic(
@@ -30,9 +32,11 @@ const STATUS_FLOW: TOrderStatus[] = [
 type ViewOrderDialogProps = {
   order: TOrder;
 };
+
 export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
   const { currentActiveOrders, setCurrentActiveOrders } = useAppStore();
   const [updating, setUpdating] = useState(false);
+
   const handleStatusChange = async (newStatus: TOrderStatus) => {
     if (!order) return;
     setUpdating(true);
@@ -40,6 +44,7 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
       status: newStatus,
       updatedAt: new Date().toISOString(),
     });
+
     if (res.status === DB_METHOD_STATUS.SUCCESS) {
       const updatedOrder = {
         ...order,
@@ -58,14 +63,17 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
 
   return (
     <div className="space-y-6">
+      {/* Title */}
       <TypographyH4>Order #{order.id}</TypographyH4>
 
-      <ScrollArea className="h-[400px]">
-        <div className="space-y-4">
+      <ScrollArea className="h-[450px] pr-2">
+        <div className="space-y-6">
           {/* Order Summary */}
-          <div>
-            <TypographyH4>Order Summary</TypographyH4>
-            <div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 text-sm">
               <p>
                 <span className="font-medium">Customer:</span>{" "}
                 {order.customer.fullName}
@@ -75,7 +83,8 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                 {order.paymentMethod}
               </p>
               <p>
-                <span className="font-medium">Status:</span> {order.status}
+                <span className="font-medium">Status:</span>{" "}
+                <Badge variant="secondary">{order.status}</Badge>
               </p>
               <p>
                 <span className="font-medium">Occasion:</span>{" "}
@@ -89,17 +98,19 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                 <span className="font-medium">Option:</span>{" "}
                 {order.orderType === "DELIVERY" ? "Delivery" : "Pick-up"}
               </p>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           {/* Items */}
-          <div className="space-y-4">
-            <TypographyH4>Items</TypographyH4>
-            <div className="space-y-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Items</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
               {order.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex justify-between items-center border-b pb-2"
+                  className="flex justify-between items-center border-b pb-2 last:border-0"
                 >
                   <div>
                     <p className="font-medium">{item.productName}</p>
@@ -110,45 +121,55 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                     )}
                     <p className="text-xs">Qty: {item.quantity}</p>
                   </div>
-                  <p>{convertCurrency(item.subtotal)}</p>
+                  <p className="font-medium">
+                    {convertCurrency(item.subtotal)}
+                  </p>
                 </div>
               ))}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Map if Delivery */}
+          {/* Delivery Map */}
           {order.orderType === "DELIVERY" && order.coordinates && (
-            <div className="space-y-4">
-              <TypographyH4>Delivery Location</TypographyH4>
-              <div className="h-64 w-full rounded-lg overflow-hidden">
-                <MapWithMarker
-                  position={[
-                    order.coordinates.latitude,
-                    order.coordinates.longitude,
-                  ]}
-                  setPosition={() => {}}
-                  isMarkerDraggable={false}
-                />
-              </div>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Delivery Location</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 w-full rounded-lg overflow-hidden">
+                  <MapWithMarker
+                    position={[
+                      order.coordinates.latitude,
+                      order.coordinates.longitude,
+                    ]}
+                    setPosition={() => {}}
+                    isMarkerDraggable={false}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Status Update */}
-          <div className="space-y-4">
-            <TypographyH4>Update Status</TypographyH4>
-            <div className="flex flex-wrap gap-2">
-              {STATUS_FLOW.map((status) => (
-                <Button
-                  key={status}
-                  variant={order.status === status ? "default" : "outline"}
-                  disabled={updating}
-                  onClick={() => handleStatusChange(status)}
-                >
-                  {status}
-                </Button>
-              ))}
-            </div>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Update Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {STATUS_FLOW.map((status) => (
+                  <Button
+                    key={status}
+                    variant={order.status === status ? "default" : "outline"}
+                    disabled={updating}
+                    onClick={() => handleStatusChange(status)}
+                  >
+                    {status.replace(/_/g, " ")}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </ScrollArea>
     </div>

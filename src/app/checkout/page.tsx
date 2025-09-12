@@ -34,7 +34,7 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
 import dynamic from "next/dynamic";
-import { increment } from "firebase/firestore";
+import { increment, serverTimestamp } from "firebase/firestore";
 import { Input } from "@/components/ui/input";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import ReceiptScreenshotUpload from "@/components/custom-ui/ReceiptScreenshotUpload";
@@ -210,7 +210,7 @@ function CheckoutPage() {
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      timestamp: new Date().toISOString(), // Firestore serverTimestamp later
+      timestamp: serverTimestamp(),
       coordinates:
         isDelivery && position
           ? {
@@ -274,12 +274,16 @@ function CheckoutPage() {
     }
     if (!isPagadian && isDelivery) {
       return (
-        <Alert variant="destructive">
-          <AlertTriangleIcon />
-          <AlertTitle>
-            Your delivery address is not within Pagadian City
-          </AlertTitle>
-        </Alert>
+        <div className="flex flex-col gap-2">
+          <Alert variant="destructive">
+            <AlertTriangleIcon />
+            <AlertTitle>
+              Your delivery address is not within Pagadian City
+            </AlertTitle>
+          </Alert>
+
+          <Button type="button" onClick={()=>setPosition([7.8257, 123.4377])}>Show Pagadian in the map</Button>
+        </div>
       );
     }
     if (!firstName || !lastName || !mobileNumber) {

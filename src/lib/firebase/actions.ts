@@ -14,6 +14,7 @@ import {
   getCountFromServer,
   getDoc,
   WhereFilterOp,
+  Timestamp,
 } from "firebase/firestore";
 import { DB_METHOD_STATUS } from "../config";
 import {
@@ -159,39 +160,79 @@ export const dbFetchCollectionWhere2Limit = async <T>({
   }
 };
 // types/firestore.ts
+export type CustomWhereOp = WhereFilterOp | "between";
+
 export type TCollectionWhere2Props = {
   collectionName: string;
   where: {
     fieldName: string;
-    fieldValue: string | number | boolean | null;
-    operation: "==" | "!=";
+    fieldValue:
+      | string
+      | number
+      | boolean
+      | Timestamp
+      | (string | number | boolean | Timestamp)[];
+    operation: CustomWhereOp;
   };
   where2?: {
     fieldName: string;
-    fieldValue: string | number | boolean | null;
-    operation: "==" | "!=";
+    fieldValue:
+      | string
+      | number
+      | boolean
+      | Timestamp
+      | (string | number | boolean | Timestamp)[];
+    operation: CustomWhereOp;
   };
 };
+
 export const dbFetchCollectionWhere2 = async <T>({
   collectionName,
   where: where1,
   where2,
 }: TCollectionWhere2Props) => {
   try {
-    // Build query constraints
-    const constraints = [
-      where(where1.fieldName, where1.operation || "==", where1.fieldValue),
-    ];
+    const constraints = [];
 
-    if (where2) {
+    // handle first where
+    if (where1.operation === "between" && Array.isArray(where1.fieldValue)) {
+      const [start, end] = where1.fieldValue as [Timestamp, Timestamp];
       constraints.push(
-        where(where2.fieldName, where2.operation || "==", where2.fieldValue)
+        where(where1.fieldName, ">=", start),
+        where(where1.fieldName, "<=", end)
+      );
+    } else {
+      constraints.push(
+        where(
+          where1.fieldName,
+          where1.operation as WhereFilterOp,
+          where1.fieldValue
+        )
       );
     }
 
-    const q = query(collection(db, collectionName), ...constraints);
+    // handle second where
+    if (where2) {
+      if (where2.operation === "between" && Array.isArray(where2.fieldValue)) {
+        const [start, end] = where2.fieldValue as [Timestamp, Timestamp];
+        constraints.push(
+          where(where2.fieldName, ">=", start),
+          where(where2.fieldName, "<=", end)
+        );
+      } else {
+        constraints.push(
+          where(
+            where2.fieldName,
+            where2.operation as WhereFilterOp,
+            where2.fieldValue
+          )
+        );
+      }
+    }
 
+    const q = query(collection(db, collectionName), ...constraints);
     const querySnapshot = await getDocs(q);
+
     const results: T[] = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -205,6 +246,8 @@ export const dbFetchCollectionWhere2 = async <T>({
     };
   }
 };
+
+
 
 export const dbUpdateDocument = async <T extends DocumentData>(
   collectionName: string,

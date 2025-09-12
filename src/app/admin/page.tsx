@@ -3,16 +3,24 @@ import RecentOrderItem from "@/components/admin/orders/RecentOrderItem";
 import { TypographyH4 } from "@/components/custom-ui/typography";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { db } from "@/firebase";
+import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
+import { dbFetchCollectionWhere2 } from "@/lib/firebase/actions";
 import {
   getActiveOrdersCount,
-  getCompletedOrdersToday,
   getTopProductToday,
   getTotalSalesToday,
 } from "@/lib/firebase/custom-queries";
 import { useAppStore } from "@/lib/store";
 import { convertCurrency } from "@/lib/utils";
 import { TOrder } from "@/typings";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { endOfDay, startOfDay } from "date-fns";
+import {
+  collection,
+  onSnapshot,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import {
   ClipboardCheckIcon,
   ClipboardListIcon,
@@ -26,6 +34,9 @@ function AdminPage() {
   const [totalActive, setTotalActive] = useState(0);
   const [totalCompleted, setTotalCompleted] = useState(0);
   const [topProduct, setTopProduct] = useState<string | null>(null);
+  const [completedOrdersToday, setCompletedOrdersToday] = useState<TOrder[]>(
+    []
+  );
 
   useEffect(() => {
     const ref = collection(db, "orders");
@@ -55,13 +66,37 @@ function AdminPage() {
       setSalesToday(sales);
       const activeOrders = await getActiveOrdersCount();
       setTotalActive(activeOrders);
-      const completed = await getCompletedOrdersToday();
-      setTotalCompleted(completed);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const start = Timestamp.fromDate(startOfDay(new Date()));
+      const end = Timestamp.fromDate(endOfDay(new Date()));
+
+      const res = await dbFetchCollectionWhere2({
+        collectionName: DB_COLLECTION.ORDERS,
+        where: {
+          fieldName: "status",
+          fieldValue: "COMPLETED",
+          operation: "==",
+        },
+        where2: {
+          fieldName: "timestamp",
+          fieldValue: [start, end],
+          operation: "between", // you’ll need to handle this in dbFetchCollectionWhere2
+        },
+      });
+      if (res.status === DB_METHOD_STATUS.ERROR) {
+        console.log(res.message);
+      }
+      if (res.data) {
+        setCompletedOrdersToday(res.data as TOrder[]);
+        setTotalCompleted(res.data.length);
+      }
       const top = await getTopProductToday();
       setTopProduct(top);
     };
     fetchDashboardData();
-  }, []);
+  }, [currentActiveOrders]);
   return (
     <div className="flex-1 flex flex-col gap-4 h-full">
       <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-4">
@@ -103,7 +138,21 @@ function AdminPage() {
             </div>
           </ScrollArea>
         </div>
-        <div className="flex-1 xl:col-span-2 2xl:col-span-3 flex flex-col gap-4 bg-white p-4 rounded-lg h-full"></div>
+        <div className="flex-1 xl:col-span-2 2xl:col-span-3 flex flex-col gap-4 bg-white p-4 rounded-lg h-full">
+          <TypographyH4>Completed Orders Today</TypographyH4>
+          <ScrollArea className="flex-1 border rounded-lg p-2">
+            <div className="space-y-2">
+              {completedOrdersToday.map((item) => {
+                return (
+                  <RecentOrderItem
+                    key={`active-orders-${item.id}`}
+                    order={item}
+                  />
+                );
+              })}
+            </div>
+          </ScrollArea>
+        </div>
       </div>
     </div>
   );
