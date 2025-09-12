@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { dbUpdateDocument } from "@/lib/firebase/actions";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
-import AddPaymentOptionButton from "@/components/admin/settings/AddPaymentOptionButton";
+import PaymentMethodsSettingsSection from "@/components/admin/settings/payment-details/PaymentMethodsSettingsSection";
 function AdminSettingsPage() {
   const { currentSettings, setCurrentSettings } = useAppStore();
 
@@ -54,28 +54,13 @@ function AdminSettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 flex-1 h-full">
+    <div className="flex flex-col gap-4 flex-1 h-full bg-white p-4 rounded-lg">
       <div className="flex justify-between items-center gap-2">
         <SectionTitle>Settings</SectionTitle>
-        <AddSettingsMediaDialog />
       </div>
       <AdminSettingsForm />
 
-      <div className="space-y-2">
-        <TypographyH4>Payment Options</TypographyH4>
-        <div className="space-y-2">
-          {currentSettings.paymentOptions?.map((item) => {
-            return (
-              <div key={`payment-option-item-${item.accountNumber}`}>
-                <div>{item.accountName}</div>
-                <div>{item.accountNumber}</div>
-                <div>{item.providerName}</div>
-              </div>
-            );
-          })}
-        </div>
-        <AddPaymentOptionButton />
-      </div>
+      <PaymentMethodsSettingsSection />
       <div className="grid grid-cols-1 gap-2">
         <TypographyH4>Gallery</TypographyH4>
         {currentSettings.images?.length === 0 ? (
@@ -114,6 +99,7 @@ function AdminSettingsPage() {
             })
             .reverse()}
         </div>
+        <AddSettingsMediaDialog />
       </div>
 
       <Dialog open={isOpenConfirm} onOpenChange={setIsOpenConfirm}>

@@ -113,3 +113,4 @@ export function hhmmssToSeconds(time: string): number {
 export const normalizeTeamName = (teamName: string) => {
   return teamName?.toLowerCase().replace(/\s+/g, " ").replace(/\./g, "").trim();
 };
+

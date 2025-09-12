@@ -59,7 +59,7 @@ function GoogleLoginButton() {
       if (firebaseUser) {
         setGoogleUser({
           uid: firebaseUser.uid,
-          displayName: firebaseUser.displayName || "No name",
+          displayName: firebaseUser.displayName || "Anonymous",
           email: firebaseUser.email || "No Email",
           photoURL: firebaseUser.photoURL || null,
         });

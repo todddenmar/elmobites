@@ -2,14 +2,7 @@ import { FieldValue } from "firebase/firestore";
 import { ReactNode } from "react";
 
 export type TPaymentMethod = "E-WALLET" | "CASH" | "BANK_TRANSFER";
-export type TPaymentDetails = {
-  id: string;
-  accountName: string;
-  accountNumber: string;
-  paymentMethod: TPaymentMethod;
-  paymentProvider: string;
-  qrImageURL?: string | null;
-};
+
 export type TRaceGender = "male" | "female";
 export type TGoogleUser = {
   uid: string;
@@ -126,15 +119,17 @@ export type TProductCategory = {
 
 export type TSettings = {
   deliveryFee: number;
-  paymentOptions: TPaymentOptionDetails[];
+  paymentOptions: TPaymentDetails[];
   updatedAt: string;
   images?: TMediaFile[] | null;
 };
-export type TPaymentOptionDetails = {
+export type TPaymentDetails = {
   id: string;
   accountName: string;
   accountNumber: string;
-  providerName: string;
+  paymentMethod: TPaymentMethod;
+  paymentProvider: string;
+  qrImageURL?: string | null;
 };
 
 export type TOrderStatus =

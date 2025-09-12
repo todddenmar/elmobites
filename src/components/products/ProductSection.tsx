@@ -159,6 +159,58 @@ function ProductSection({ product, category }: ProductSectionProps) {
     toast.success("Added to cart");
   };
 
+  const renderButtons = () => {
+    if (maxStock < 1) {
+      return null;
+    }
+    if (!selectedBranchID) {
+      return <EmptyLayout>Select a branch</EmptyLayout>;
+    }
+
+    return (
+      <div className="grid gap-4 sticky bottom-0 py-4 bg-white left-0 right-0 h-fit">
+        <div className="grid grid-cols-2 gap-4">
+          <Button
+            onClick={onAddToCart}
+            className="w-full cursor-pointer"
+            type="button"
+            size={"lg"}
+            variant={"outline"}
+          >
+            <ShoppingCartIcon /> Add To Cart
+          </Button>
+          {customerCart ? (
+            customerCart.items.length > 0 ? (
+              <CartButton isContinue />
+            ) : (
+              <Link href={"/checkout"}>
+                <Button
+                  onClick={onAddToCart}
+                  className="w-full cursor-pointer"
+                  type="button"
+                  size={"lg"}
+                >
+                  Buy Now
+                </Button>
+              </Link>
+            )
+          ) : (
+            <Link href={"/checkout"}>
+              <Button
+                onClick={onAddToCart}
+                className="w-full cursor-pointer"
+                type="button"
+                size={"lg"}
+              >
+                Buy Now
+              </Button>
+            </Link>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="px-4 py-2 lg:mx-auto lg:max-w-7xl z-10 sticky top-0 left-0 right-0 bg-white">
@@ -251,6 +303,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
                           type="button"
                           variant={isActive ? "default" : "outline"}
                           key={`branch-item-${item.id}`}
+                          className="cursor-pointer"
                           onClick={() => setSelectedBranchID(item.branchID)}
                         >
                           {store.name}
@@ -268,6 +321,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
                       variant="outline"
                       size="icon"
                       onClick={decreaseQty}
+                      className="cursor-pointer"
                     >
                       -
                     </Button>
@@ -277,6 +331,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
                       variant="outline"
                       size="icon"
                       onClick={increaseQty}
+                      className="cursor-pointer"
                     >
                       +
                     </Button>
@@ -286,37 +341,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
                   </p>
                 </div>
 
-                {selectedBranchID ? (
-                  <div className="grid gap-4 sticky bottom-0 py-4 bg-white left-0 right-0 h-fit">
-                    <div className="grid grid-cols-2 gap-4">
-                      <Button
-                        onClick={onAddToCart}
-                        className="w-full cursor-pointer"
-                        type="button"
-                        size={"lg"}
-                        variant={"outline"}
-                      >
-                        <ShoppingCartIcon /> Add To Cart
-                      </Button>
-                      {customerCart ? (
-                        <CartButton isContinue />
-                      ) : (
-                        <Link href={"/checkout"}>
-                          <Button
-                            onClick={onAddToCart}
-                            className="w-full cursor-pointer"
-                            type="button"
-                            size={"lg"}
-                          >
-                            Buy Now
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <EmptyLayout>Select a branch</EmptyLayout>
-                )}
+                {renderButtons()}
               </div>
             </div>
           </div>

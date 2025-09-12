@@ -1,6 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import {
+  browserSessionPersistence,
+  getAuth,
+  setPersistence,
+  signInAnonymously,
+} from "firebase/auth";
 import { Button } from "./ui/button";
 import { useAppStore } from "@/lib/store";
 import { Input } from "./ui/input";
@@ -11,7 +16,7 @@ function AnonymousLoginButton() {
   const { setGoogleUser } = useAppStore();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const onLogin = () => {
+  const onLogin = async () => {
     if (!name) {
       toast.error("Name required");
       return;
@@ -21,7 +26,8 @@ function AnonymousLoginButton() {
       return;
     }
     const auth = getAuth();
-    signInAnonymously(auth)
+    await setPersistence(auth, browserSessionPersistence);
+    await signInAnonymously(auth)
       .then((userCredential) => {
         const uid = userCredential.user.uid;
         // Signed in..
