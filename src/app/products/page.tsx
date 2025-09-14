@@ -1,3 +1,4 @@
+"use client";
 import ErrorCard from "@/components/custom-ui/ErrorCard";
 import ProductCard from "@/components/products/ProductCard";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
@@ -6,7 +7,6 @@ import {
   dbFetchCollectionWhere,
 } from "@/lib/firebase/actions";
 import { TProduct, TProductCategory } from "@/typings";
-import { Metadata } from "next";
 import Link from "next/link";
 import {
   Breadcrumb,
@@ -16,50 +16,37 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useEffect, useState } from "react";
 
-const getProductsData = async () => {
-  let products: TProduct[] = [];
-  let categories: TProductCategory[] = [];
-  const res = await dbFetchCollectionWhere({
-    collectionName: DB_COLLECTION.PRODUCTS,
-    fieldName: "isPublished",
-    fieldValue: true,
-    operation: "==",
-  });
-  if (res.status === DB_METHOD_STATUS.SUCCESS) {
-    products = res.data as TProduct[];
-  }
-  const resCategory = await dbFetchCollection(DB_COLLECTION.PRODUCT_CATEGORIES);
-  if (resCategory.status === DB_METHOD_STATUS.SUCCESS) {
-    categories = resCategory.data as TProductCategory[];
-  }
-  return {
-    products,
-    categories,
-  };
-};
-
-// ✅ Dynamic metadata
-export async function generateMetadata(): Promise<Metadata> {
-  const data = await getProductsData();
-
-  if (!data) {
-    return {
-      title: "Prodcuts not found | The Cake Co.",
-      description: "Our cakes will be available soon.",
+const ProductsPage = () => {
+  const [products, setProducts] = useState<TProduct[]>([]);
+  const [categories, setCategories] = useState<TProductCategory[]>([]);
+  useEffect(() => {
+    const getProductsData = async () => {
+      let products: TProduct[] = [];
+      let categories: TProductCategory[] = [];
+      const res = await dbFetchCollectionWhere({
+        collectionName: DB_COLLECTION.PRODUCTS,
+        fieldName: "isPublished",
+        fieldValue: true,
+        operation: "==",
+      });
+      if (res.status === DB_METHOD_STATUS.SUCCESS) {
+        products = res.data as TProduct[];
+      }
+      const resCategory = await dbFetchCollection(
+        DB_COLLECTION.PRODUCT_CATEGORIES
+      );
+      if (resCategory.status === DB_METHOD_STATUS.SUCCESS) {
+        categories = resCategory.data as TProductCategory[];
+      }
+      setProducts(products || []);
+      setCategories(categories || []);
     };
-  }
+    getProductsData();
+  }, []);
 
-  return {
-    title: `The Cake Co. Products`,
-    description: `Order delicious custom cakes online from The Cake Co. Pagadian City. Freshly baked, beautifully designed, and delivered straight to your doorstep!`,
-  };
-}
-
-const ProductsPage = async () => {
-  const data = await getProductsData();
-  const { products, categories } = data;
-  if (!data) {
+  if (!products) {
     return (
       <ErrorCard
         title="There are no products yet"
