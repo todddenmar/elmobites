@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   <div style="background-color: #ffffff; padding: 20px; border-radius: 20px; max-width: 540px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);">
     
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="https://thecakecopagadian.com/logo.png" alt="The Cake Co. logo" height="80" />
+      <img src="https://thecakecopagadian.com/images/logo.png" alt="The Cake Co. logo" height="150" />
     </div>
 
     <p style="font-weight: bold; font-size: 24px; margin: 0 0 10px 0;">
