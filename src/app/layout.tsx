@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   description:
     "Order delicious custom cakes online from The Cake Co. Pagadian City. Freshly baked, beautifully designed, and delivered straight to your doorstep.",
   openGraph: {
-    images: "https://thecakecopagadian.vercel.app/images/thumbnail.png",
+    images: "https://thecakecopagadian.com/images/thumbnail.png",
   },
   keywords: ["Cakes", "Pagadian City", "Coffee", "Cafe"],
 };
