@@ -21,6 +21,8 @@ import { toast } from "sonner";
 import { dbUpdateDocument } from "@/lib/firebase/actions";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import PaymentMethodsSettingsSection from "@/components/admin/settings/payment-details/PaymentMethodsSettingsSection";
+import QrCodeViewer from "@/components/custom-ui/QrCodeViewer";
+import { Label } from "@/components/ui/label";
 function AdminSettingsPage() {
   const { currentSettings, setCurrentSettings } = useAppStore();
 
@@ -61,6 +63,15 @@ function AdminSettingsPage() {
       <AdminSettingsForm />
 
       <PaymentMethodsSettingsSection />
+      <div className="w-full flex justify-start">
+        <div className="space-y-2">
+          <Label>QR Code</Label>
+          <div className="border rounded-lg p-4">
+            <QrCodeViewer url={"https://www.thecakecopagadian.com/"} />
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-2">
         <TypographyH4>Gallery</TypographyH4>
         {currentSettings.images?.length === 0 ? (
