@@ -6,7 +6,7 @@ import {
   dbFetchCollection,
   dbFetchCollectionWhere,
 } from "@/lib/firebase/actions";
-import { TProduct, TProductCategory } from "@/typings";
+import { TInventory, TProduct, TProductCategory } from "@/typings";
 import Link from "next/link";
 import {
   Breadcrumb,
@@ -21,10 +21,12 @@ import { useEffect, useState } from "react";
 const ProductsPage = () => {
   const [products, setProducts] = useState<TProduct[]>([]);
   const [categories, setCategories] = useState<TProductCategory[]>([]);
+  const [inventory, setInventory] = useState<TInventory[]>([]);
   useEffect(() => {
     const getProductsData = async () => {
       let products: TProduct[] = [];
       let categories: TProductCategory[] = [];
+      let inventory: TInventory[] = [];
       const res = await dbFetchCollectionWhere({
         collectionName: DB_COLLECTION.PRODUCTS,
         fieldName: "isPublished",
@@ -40,8 +42,14 @@ const ProductsPage = () => {
       if (resCategory.status === DB_METHOD_STATUS.SUCCESS) {
         categories = resCategory.data as TProductCategory[];
       }
+
+      const resInventory = await dbFetchCollection(DB_COLLECTION.INVENTORY);
+      if (resInventory.status === DB_METHOD_STATUS.SUCCESS) {
+        inventory = resInventory.data as TInventory[];
+      }
       setProducts(products || []);
       setCategories(categories || []);
+      setInventory(inventory || []);
     };
     getProductsData();
   }, []);
@@ -77,12 +85,22 @@ const ProductsPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
           {products.map((item) => {
             const category = categories.find((c) => c.id === item.categoryID);
+            let stocks = 0;
+            inventory.forEach((i) => {
+              if (i.productID === item.id && i.stock > 0) {
+                stocks = stocks + 1;
+              }
+            });
             return (
               <Link
                 key={`product-item-${item.id}`}
                 href={`/products/${item.slug}`}
               >
-                <ProductCard product={item} category={category || null} />
+                <ProductCard
+                  isOutOfStock={stocks > 0 ? false : true}
+                  product={item}
+                  category={category || null}
+                />
               </Link>
             );
           })}

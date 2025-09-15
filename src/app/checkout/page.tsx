@@ -237,12 +237,10 @@ function CheckoutPage() {
     toast.success("Order successfully created");
 
     if (currentSettings.managerEmail) {
-      // if (process.env.NEXT_PUBLIC_IS_PRODUCTION === "true") {
       await onSendOrderEmail({
         order: order,
         email: currentSettings.managerEmail,
       });
-      // }
     }
     router.push("/orders/" + order.id);
     setCustomerCart(null);

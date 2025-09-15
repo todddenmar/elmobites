@@ -3,13 +3,20 @@ import { TProduct, TProductCategory } from "@/typings";
 import React from "react";
 import { CardShineEffect } from "../custom-ui/CardShineEffect";
 import Image from "next/image";
+import { Badge } from "../ui/badge";
 
 type ProductCardProps = {
   product: TProduct;
   category: TProductCategory | null;
   isPage?: boolean;
+  isOutOfStock?: boolean;
 };
-function ProductCard({ product, category, isPage }: ProductCardProps) {
+function ProductCard({
+  product,
+  category,
+  isPage,
+  isOutOfStock,
+}: ProductCardProps) {
   return (
     <div
       className={cn(
@@ -17,7 +24,12 @@ function ProductCard({ product, category, isPage }: ProductCardProps) {
         isPage ? "" : "border"
       )}
     >
-      <div className="relative z-20 max-w-2/3 lg:max-w-sm space-y-2 lg:space-y-4 flex flex-col h-full flex-1 ">
+      <div
+        className={cn(
+          "relative z-20 max-w-2/3 lg:max-w-sm space-y-2 lg:space-y-4 flex flex-col h-full flex-1 ",
+          isOutOfStock ? "opacity-50" : ""
+        )}
+      >
         <div className="flex-1">
           <div className="font-accent uppercase text-2xl leading-5 lg:leading-10 lg:text-5xl">
             {product.name}
@@ -50,7 +62,11 @@ function ProductCard({ product, category, isPage }: ProductCardProps) {
         </div>
       </div>
       {product.thumbnailImage ? (
-        <div className="absolute right-0 top-0 p-4 w-[150px] h-full lg:w-[200px] z-10">
+        <div
+          className={cn(
+            "absolute right-0 top-0 w-[150px] h-full lg:w-[200px] z-10"
+          )}
+        >
           <CardShineEffect />
           <Image
             src={product.thumbnailImage}
@@ -59,6 +75,11 @@ function ProductCard({ product, category, isPage }: ProductCardProps) {
             height={400}
             className="object-cover h-full w-full"
           />
+          {isOutOfStock ? (
+            <div className="absolute inset-0 opacity-100 flex flex-col items-center justify-center">
+              <Badge>Out of stock</Badge>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
