@@ -240,7 +240,7 @@ function CheckoutPage() {
       // if (process.env.NEXT_PUBLIC_IS_PRODUCTION === "true") {
       await onSendOrderEmail({
         order: order,
-        email: email,
+        email: currentSettings.managerEmail,
       });
       // }
     }
