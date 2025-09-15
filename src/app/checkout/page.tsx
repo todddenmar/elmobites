@@ -80,6 +80,12 @@ function CheckoutPage() {
   const [email, setEmail] = useState("");
   const [isLoadingLogin, setIsLoadingLogin] = useState(false);
 
+  useEffect(() => {
+    if (deliveryOption === "delivery") {
+      setPaymentOption(PAYMENT_OPTION.E_WALLET.id as TPaymentMethod);
+    }
+  }, [deliveryOption]);
+
   const onLogin = () => {
     if (!firstName || !lastName) {
       toast.error("Full name required");
@@ -221,6 +227,7 @@ function CheckoutPage() {
     };
 
     console.log("Order Data:", order);
+    return;
 
     const res = await dbSetDocument({
       collectionName: DB_COLLECTION.ORDERS,
@@ -546,48 +553,52 @@ function CheckoutPage() {
             {googleUser ? (
               <div className="space-y-4">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 gap-2">
-                    <Label>Payment Type</Label>
-                    <PaymentOptionSelect
-                      value={paymentOption}
-                      onChange={setPaymentOption}
-                    />
+                  <div className="space-y-4">
+                    {isDelivery ? null : (
+                      <div className="grid grid-cols-1 gap-2">
+                        <Label>Payment Type</Label>
+                        <PaymentOptionSelect
+                          value={paymentOption}
+                          onChange={setPaymentOption}
+                        />
+                      </div>
+                    )}
+                    {paymentOption != "CASH" ? (
+                      <div className="space-y-2">
+                        <Label
+                          className={cn(
+                            "",
+                            selectedPaymentDetails === null
+                              ? "text-red-500 animate-pulse"
+                              : ""
+                          )}
+                        >
+                          Select Payment Option
+                        </Label>
+                        {currentSettings?.paymentOptions
+                          ?.filter(
+                            (option) => option.paymentMethod === paymentOption
+                          )
+                          ?.map((item) => {
+                            const isActive =
+                              item.id === selectedPaymentDetails?.id;
+                            return (
+                              <div
+                                onClick={() => setSelectedPaymentDetails(item)}
+                                key={`payment-option-item-${item.id}`}
+                                className={cn(
+                                  "opacity-50 hover:opacity-100 cursor-pointer border rounded-lg  overflow-hidden transition-all duration-150",
+                                  isActive ? "opacity-100" : ""
+                                )}
+                              >
+                                <PaymentDetailsItem paymentDetails={item} />
+                              </div>
+                            );
+                          })}
+                      </div>
+                    ) : null}
                   </div>
 
-                  {paymentOption != "CASH" ? (
-                    <div className="space-y-2">
-                      <Label
-                        className={cn(
-                          "",
-                          selectedPaymentDetails === null
-                            ? "text-red-500 animate-pulse"
-                            : ""
-                        )}
-                      >
-                        Select Payment Option
-                      </Label>
-                      {currentSettings?.paymentOptions
-                        ?.filter(
-                          (option) => option.paymentMethod === paymentOption
-                        )
-                        ?.map((item) => {
-                          const isActive =
-                            item.id === selectedPaymentDetails?.id;
-                          return (
-                            <div
-                              onClick={() => setSelectedPaymentDetails(item)}
-                              key={`payment-option-item-${item.id}`}
-                              className={cn(
-                                "opacity-50 hover:opacity-100 cursor-pointer border rounded-lg  overflow-hidden transition-all duration-150",
-                                isActive ? "opacity-100" : ""
-                              )}
-                            >
-                              <PaymentDetailsItem paymentDetails={item} />
-                            </div>
-                          );
-                        })}
-                    </div>
-                  ) : null}
                   {paymentOption != "CASH" && (
                     <div className="grid grid-cols-1 gap-2">
                       <Label>Upload a screenshot of your payment receipt</Label>

@@ -21,12 +21,12 @@ const PaymentOptionSelect: React.FC<PaymentOptionSelectProps> = ({
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger>
-        <SelectValue placeholder="Select Gender" />
+        <SelectValue placeholder="Select Payment Option" />
       </SelectTrigger>
       <SelectContent>
         {PAYMENT_OPTIONS.map((item) => {
           return (
-            <SelectItem key={`gender-item-${item.id}`} value={item.id}>
+            <SelectItem key={`payment-option-item-${item.id}`} value={item.id}>
               {item.label}
             </SelectItem>
           );
