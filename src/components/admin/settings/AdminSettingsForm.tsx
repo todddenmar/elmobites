@@ -46,8 +46,8 @@ function AdminSettingsForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       deliveryFee: currentSettings?.deliveryFee.toString() || "50",
-      isShowingOcassion: currentSettings?.isShowingOcassion ?? false,
-      managerEmail: currentSettings?.managerEmail ?? process.env.EMAIL_FROM,
+      isShowingOcassion: currentSettings?.isShowingOcassion || false,
+      managerEmail: currentSettings?.managerEmail || process.env.EMAIL_FROM!,
     },
   });
 
@@ -59,6 +59,7 @@ function AdminSettingsForm() {
         collectionName: DB_COLLECTION.SETTINGS,
         id: "general", // you can change if you want multiple settings docs
         data: {
+          ...currentSettings,
           ...values,
           updatedAt: new Date().toISOString(),
         },

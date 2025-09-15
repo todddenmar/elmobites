@@ -450,3 +450,25 @@ export const dbCountDocuments = async ({
     };
   }
 };
+
+
+export const dbDeleteDocumentByID = async ({
+  collectionName,
+  id,
+}: {
+  collectionName: string;
+  id: string;
+}) => {
+  try {
+    await deleteDoc(doc(db, collectionName, id));
+    return { status: DB_METHOD_STATUS.SUCCESS };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { status: DB_METHOD_STATUS.ERROR, message: e.message };
+    }
+    return {
+      status: DB_METHOD_STATUS.ERROR,
+      message: "An unknown error occurred",
+    };
+  }
+};

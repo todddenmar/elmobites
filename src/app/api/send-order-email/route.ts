@@ -1,8 +1,23 @@
+import { TOrderItem } from "@/typings";
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 export async function POST(request: Request) {
   const body = await request.json();
+
+  // generate order items table rows
+  const orderItemsHtml = ((body.items as TOrderItem[]) || [])
+    .map(
+      (item) => `
+        <tr style="border: 1px solid #d1d5db;">
+          <td style="padding: 12px;">${item.productName}</td>
+          <td style="padding: 12px;">${item.variantName}</td>
+          <td style="padding: 12px; text-align: center;">${item.quantity}</td>
+          <td style="padding: 12px; text-align: right;">₱${item.price.toLocaleString()}</td>
+        </tr>
+      `
+    )
+    .join("");
 
   const message = {
     from: `The Cake Co. <${process.env.EMAIL_FROM}>`,
@@ -20,7 +35,7 @@ export async function POST(request: Request) {
   <div style="background-color: #ffffff; padding: 20px; border-radius: 20px; max-width: 540px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);">
     
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="https://thecakecopagadian.com/images/logo.png" alt="The Cake Co. logo" height="100" />
+      <img src="https://thecakecopagadian.com/images/logo-white-bg.png" alt="The Cake Co. logo" height="100" />
     </div>
 
     <p style="font-weight: bold; font-size: 24px; margin: 0 0 10px 0;">
@@ -47,6 +62,28 @@ export async function POST(request: Request) {
         <td style="padding: 12px; font-weight: bold;">Payment Method:</td>
         <td style="padding: 12px;">${body.paymentProvider}</td>
       </tr>
+      <tr style="border: 1px solid #d1d5db;">
+        <td style="padding: 12px; font-weight: bold;">Payment Method:</td>
+        <td style="padding: 12px;">${body.orderType}</td>
+      </tr>
+    </table>
+
+    <p style="font-weight: bold; font-size: 16px; margin: 0 0 10px 0;">Order Items:</p>
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px;">
+      <thead>
+        <tr style="background-color: #f3f4f6;">
+          <th style="padding: 12px; text-align: left;">Item</th>
+          <th style="padding: 12px; text-align: left;">Variant</th>
+          <th style="padding: 12px; text-align: center;">Qty</th>
+          <th style="padding: 12px; text-align: right;">Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${
+          orderItemsHtml ||
+          `<tr><td colspan="3" style="padding:12px;text-align:center;">No items found</td></tr>`
+        }
+      </tbody>
     </table>
 
     <div style="text-align: right;">

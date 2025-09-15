@@ -43,7 +43,7 @@ function ProductVariantsTableData({ product }: ProductVariantsTableDataProps) {
                     key={`product-variant-${item.id}`}
                     className="flex gap-4 border rounded-lg p-2"
                   >
-                    <div className="rounded-lg relative overflow-hidden aspect-square">
+                    <div className="rounded-lg relative flex flex-col border items-center justify-center overflow-hidden aspect-square w-[50px]">
                       {item.thumbnailImage ? (
                         <Image
                           src={item.thumbnailImage}

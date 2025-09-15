@@ -264,6 +264,8 @@ function CheckoutPage() {
         totalAmount: order.totalAmount,
         paymentProvider: order.payment.option.paymentProvider,
         email: email,
+        items: order.items,
+        orderType: order.orderType,
       }),
     });
     if (res) {

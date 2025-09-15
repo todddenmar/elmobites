@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import ErrorCard from "@/components/custom-ui/ErrorCard";
 import ProductSection from "@/components/products/ProductSection";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
@@ -6,62 +9,61 @@ import {
   dbFetchCollectionWhere,
 } from "@/lib/firebase/actions";
 import { TProduct, TProductCategory } from "@/typings";
-import { Metadata } from "next";
+import { useParams } from "next/navigation";
 
-type Params = Promise<{ slug: string }>;
+const ProductPage = () => {
+  const params = useParams();
+  const productSlug = params.slug as string;
+  const [product, setProduct] = useState<TProduct | null>(null);
+  const [category, setCategory] = useState<TProductCategory | null>(null);
+  const [loading, setLoading] = useState(true);
 
-const getProductDataBySlug = async (productSlug: string) => {
-  let product = null;
-  let category = null;
-  const res = await dbFetchCollectionWhere({
-    collectionName: DB_COLLECTION.PRODUCTS,
-    fieldName: "slug",
-    fieldValue: productSlug,
-    operation: "==",
-  });
-  if (res.status === DB_METHOD_STATUS.SUCCESS) {
-    if (res.data) product = res.data[0] as TProduct;
-  }
+  useEffect(() => {
+    const getProductDataBySlug = async () => {
+      let product: TProduct | null = null;
+      let category: TProductCategory | null = null;
 
-  const resCategory = await dbFetchCollection(DB_COLLECTION.PRODUCT_CATEGORIES);
-  if (resCategory.status === DB_METHOD_STATUS.SUCCESS) {
-    if (resCategory.data) category = resCategory.data[0] as TProductCategory;
-  }
-  return {
-    product: product
-      ? { ...product, timestamp: product.timestamp.toString() }
-      : null,
-    category: category || null,
-  };
-};
+      const res = await dbFetchCollectionWhere({
+        collectionName: DB_COLLECTION.PRODUCTS,
+        fieldName: "slug",
+        fieldValue: productSlug,
+        operation: "==",
+      });
 
-// ✅ Dynamic metadata
-export async function generateMetadata(props: {
-  params: Params;
-}): Promise<Metadata> {
-  const params = await props.params;
-  const { product } = await getProductDataBySlug(params.slug);
+      if (res.status === DB_METHOD_STATUS.SUCCESS && res.data?.[0]) {
+        const productData = res.data[0] as TProduct;
+        product = {
+          ...productData,
+          timestamp: productData.timestamp.toString(),
+        };
+      }
 
-  if (!product) {
-    return {
-      title: "Product not found | The Cake Co.",
-      description: "The Product you are trying to view does not exist.",
+      const resCategory = await dbFetchCollection(
+        DB_COLLECTION.PRODUCT_CATEGORIES
+      );
+      if (
+        resCategory.status === DB_METHOD_STATUS.SUCCESS &&
+        resCategory.data?.[0]
+      ) {
+        category = resCategory.data[0] as TProductCategory;
+      }
+
+      setProduct(product);
+      setCategory(category);
+      setLoading(false);
     };
+
+    if (productSlug) {
+      getProductDataBySlug();
+    } else {
+      setLoading(false);
+    }
+  }, [productSlug]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  return {
-    title: `${product.name} | Productracers`,
-    description: `Order delicious custom cakes online from The Cake Co. Pagadian City. Freshly baked, beautifully designed, and delivered straight to your doorstep!`,
-  };
-}
-
-const ProductPage = async (props: { params: Params }) => {
-  const params = await props.params;
-  if (!params) {
-    return <div>Page Error</div>;
-  }
-  const slug = params.slug;
-  const { product, category } = await getProductDataBySlug(slug);
   if (!product) {
     return (
       <ErrorCard
@@ -72,11 +74,8 @@ const ProductPage = async (props: { params: Params }) => {
       />
     );
   }
-  return (
-    <div>
-      <ProductSection product={product} category={category} />
-    </div>
-  );
+
+  return <ProductSection product={product} category={category} />;
 };
 
 export default ProductPage;
