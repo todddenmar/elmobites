@@ -120,6 +120,8 @@ export type TSettings = {
   paymentOptions: TPaymentDetails[];
   updatedAt: string;
   images?: TMediaFile[] | null;
+  isShowingOcassion: boolean;
+  managerEmail: string;
 };
 export type TPaymentDetails = {
   id: string;

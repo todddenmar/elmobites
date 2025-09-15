@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,26 +19,35 @@ import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { dbSetDocument } from "@/lib/firebase/actions";
 import { Button } from "@/components/ui/button";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
+import { useAppStore } from "@/lib/store";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // --------------------
 // Schema
 // --------------------
-
 const formSchema = z.object({
   deliveryFee: z
-    .number({ error: "Delivery fee must be a number" })
-    .min(1, { message: "Delivery fee must be greater than 0" }),
+    .string()
+    .min(1, { message: "Delivery fee is required" })
+    .regex(/^\d+$/, { message: "Delivery fee must be a number" }),
+  isShowingOcassion: z.boolean().catch(false), // ✅ ensures it's always boolean
+  managerEmail: z.string().min(2, {
+    message: "Email must be at least 2 characters.",
+  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 function AdminSettingsForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { currentSettings } = useAppStore();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      deliveryFee: 50,
+      deliveryFee: currentSettings?.deliveryFee.toString() || "50",
+      isShowingOcassion: currentSettings?.isShowingOcassion ?? false,
+      managerEmail: currentSettings?.managerEmail ?? process.env.EMAIL_FROM,
     },
   });
 
@@ -85,10 +95,43 @@ function AdminSettingsForm() {
                   type="number"
                   placeholder="Enter delivery fee"
                   {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="managerEmail"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Address</FormLabel>
+              <FormControl>
+                <Input type="email" {...field} />
+              </FormControl>
+              <FormDescription>
+                This email will be the one to receive the order requests.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* Is Showing Occasion */}
+        <FormField
+          control={form.control}
+          name="isShowingOcassion"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => field.onChange(!!checked)} // ✅ force boolean
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Show Occasion</FormLabel>
+              </div>
             </FormItem>
           )}
         />

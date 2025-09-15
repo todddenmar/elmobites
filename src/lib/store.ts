@@ -66,6 +66,8 @@ export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
       paymentOptions: [],
       updatedAt: new Date().toISOString(),
       images: [],
+      isShowingOcassion: false,
+      managerEmail: "",
     },
     setCurrentSettings: (currentSettings) => set(() => ({ currentSettings })),
   })

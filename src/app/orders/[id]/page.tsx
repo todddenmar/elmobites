@@ -48,7 +48,6 @@ export default function OrderDetailPage() {
     const unsubscribe = onSnapshot(
       doc(db, DB_COLLECTION.ORDERS, orderId),
       (docItem) => {
-        console.log("Current data: ", docItem.data());
         const orderResult = docItem.data() as TOrder;
         if (orderResult) setOrder(orderResult);
       }

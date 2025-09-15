@@ -235,10 +235,44 @@ function CheckoutPage() {
 
     await updateInventory(order.items);
     toast.success("Order successfully created");
+
+    if (currentSettings.managerEmail) {
+      // if (process.env.NEXT_PUBLIC_IS_PRODUCTION === "true") {
+      await onSendOrderEmail({
+        order: order,
+        email: email,
+      });
+      // }
+    }
     router.push("/orders/" + order.id);
     setCustomerCart(null);
   };
 
+  const onSendOrderEmail = async ({
+    order,
+    email,
+  }: {
+    order: TOrder;
+    email: string;
+  }) => {
+    const res = await fetch("/api/send-order-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: order.id,
+        name: `${order.customer.firstName} ${order.customer.lastName}`,
+        totalAmount: order.totalAmount,
+        paymentProvider: order.payment.option.paymentProvider,
+        email: email,
+      }),
+    });
+    if (res) {
+      const resultData = res.json();
+      console.log({ resultData });
+    } else {
+      console.log({ error: res });
+    }
+  };
   const updateInventory = async (items: TOrderItem[]) => {
     for (const item of items) {
       try {
@@ -282,7 +316,9 @@ function CheckoutPage() {
             </AlertTitle>
           </Alert>
 
-          <Button type="button" onClick={()=>setPosition([7.8257, 123.4377])}>Show Pagadian in the map</Button>
+          <Button type="button" onClick={() => setPosition([7.8257, 123.4377])}>
+            Show Pagadian in the map
+          </Button>
         </div>
       );
     }
@@ -386,34 +422,36 @@ function CheckoutPage() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-2">
-              <Label className="font-semibold text-base">
-                Occasion (Birthday, Wedding, Anniversary…)
-              </Label>
-              <Input
-                value={occasion}
-                placeholder="🎂 What are we celebrating?"
-                onChange={(val) => setOccasion(val.target.value)}
-              />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {OCCASIONS.sort().map((item, idx) => {
-                  return (
-                    <Badge
-                      onClick={() => setOccasion(item)}
-                      key={`occasion-item-${idx}`}
-                      className="cursor-pointer"
-                      variant={
-                        occasion.toLowerCase().includes(item.toLowerCase())
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {item}
-                    </Badge>
-                  );
-                })}
+            {currentSettings.isShowingOcassion ? (
+              <div className="grid grid-cols-1 gap-2">
+                <Label className="font-semibold text-base">
+                  Occasion (Birthday, Wedding, Anniversary…)
+                </Label>
+                <Input
+                  value={occasion}
+                  placeholder="🎂 What are we celebrating?"
+                  onChange={(val) => setOccasion(val.target.value)}
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {OCCASIONS.sort().map((item, idx) => {
+                    return (
+                      <Badge
+                        onClick={() => setOccasion(item)}
+                        key={`occasion-item-${idx}`}
+                        className="cursor-pointer"
+                        variant={
+                          occasion.toLowerCase().includes(item.toLowerCase())
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        {item}
+                      </Badge>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
           <div className="border rounded-lg p-4 space-y-6 h-fit bg-white w-full lg:max-w-sm">
             <div className="space-y-4">
