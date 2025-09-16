@@ -94,6 +94,7 @@ export type TProductVariantItem = TProductVariant & {
   productName: string;
   productCreatedAt: string;
 };
+export type TTransactionType = "ADD" | "REMOVE";
 
 export type TInventoryTransactionLog = {
   id: string;
@@ -102,8 +103,10 @@ export type TInventoryTransactionLog = {
   createdAt: string;
   timestamp: FieldValue | string;
   storeID: string;
-  message: string;
-  title: string;
+  inventoryID: string;
+  notes: string;
+  stockAmount: number;
+  type: TTransactionType | null;
 };
 
 export type TInventory = {

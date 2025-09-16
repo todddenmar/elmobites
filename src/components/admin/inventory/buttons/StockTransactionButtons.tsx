@@ -7,9 +7,10 @@ import {
   TInventory,
   TInventoryListItem,
   TInventoryTransactionLog,
+  TTransactionType,
 } from "@/typings";
 import { serverTimestamp } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -19,10 +20,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 type StockTransactionButtonsProps = {
   inventoryItem: TInventoryListItem;
 };
-type TTransactionType = "ADD" | "REMOVE";
 function StockTransactionButtons({
   inventoryItem,
 }: StockTransactionButtonsProps) {
@@ -30,7 +32,28 @@ function StockTransactionButtons({
   const [isLoading, setIsLoading] = useState(false);
   const [stockAmount, setStockAmount] = useState(1);
   const [type, setType] = useState<TTransactionType | null>(null);
+  const [notes, setNotes] = useState("");
   const [isOpenForm, setIsOpenForm] = useState(false);
+
+  const stockTransactionNotes = {
+    ADD: [
+      "New stock received from supplier",
+      "Returned item added back to inventory",
+      "Manual adjustment (correction)",
+      "Transfer received from Branch:",
+    ],
+    REMOVE: [
+      "Sold to customer (walk-in)",
+      "Damaged/expired item removed",
+      "Manual adjustment (correction)",
+      "Transfer sent to Branch:",
+    ],
+  };
+  useEffect(() => {
+    if (type) setNotes(stockTransactionNotes[type][0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [type]);
+
   const onChangeStock = async () => {
     setIsLoading(true);
     const newTotalStock =
@@ -53,8 +76,7 @@ function StockTransactionButtons({
       toast.error("Error updating inventory");
     } else {
       addLog({
-        title: `${type} ${stockAmount}`,
-        message: `${inventoryItem.productName} (${inventoryItem.variantName})`,
+        notes: notes,
         storeID: inventoryItem.branchID,
       });
       const updatedInventory = currentInventory.map((item) =>
@@ -65,16 +87,15 @@ function StockTransactionButtons({
       setIsOpenForm(false);
     }
     setStockAmount(1);
+    setNotes("");
     setIsLoading(false);
   };
 
   const addLog = async ({
-    message,
-    title,
+    notes,
     storeID,
   }: {
-    message: string;
-    title: string;
+    notes: string;
     storeID: string;
   }) => {
     if (!userData) return;
@@ -84,9 +105,11 @@ function StockTransactionButtons({
       userName: `${userData?.firstname} ${userData?.lastname}`,
       createdAt: new Date().toISOString(),
       timestamp: serverTimestamp(),
-      message: message,
-      title: title,
+      notes: notes,
+      type: type,
+      stockAmount: stockAmount,
       storeID: storeID,
+      inventoryID: inventoryItem.id,
     };
     const res = await dbSetDocument({
       collectionName: DB_COLLECTION.INVENTORY_TRANSACTIONS_LOGS,
@@ -150,6 +173,26 @@ function StockTransactionButtons({
                     ? inventoryItem.stock + stockAmount
                     : inventoryItem.stock - stockAmount}
                 </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2">
+              <Label>Notes</Label>
+              <Input
+                value={notes}
+                onChange={(val) => setNotes(val.target.value)}
+              />
+              <div className="flex flex-wrap gap-2 mt-2">
+                {(type ? stockTransactionNotes[type] : []).map((n) => (
+                  <Badge
+                    key={n}
+                    variant="outline"
+                    className="cursor-pointer hover:bg-muted"
+                    onClick={() => setNotes(n)}
+                  >
+                    {n}
+                  </Badge>
+                ))}
               </div>
             </div>
             {isLoading ? (
