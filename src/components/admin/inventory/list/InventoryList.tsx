@@ -16,7 +16,7 @@ function InventoryList({ inventoryItems }: InventoryListProps) {
 
   return (
     <div className="space-y-4 bg-white p-4 rounded-lg border">
-      <TypographyH4>Assigned Inventory</TypographyH4>
+      <TypographyH4>In Stock</TypographyH4>
       <ScrollArea className="h-[500px] border rounded-lg">
         <div className="flex flex-col gap-2 p-2">
           {sortByProductID.map((item) => {

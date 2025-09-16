@@ -55,7 +55,7 @@ function StockTransactionsLog({ branchID }: StockTransactionsLogProps) {
 
   return (
     <div className="space-y-4 bg-white p-4 rounded-lg border">
-      <TypographyH4>Inventory Logs Today</TypographyH4>
+      <TypographyH4>Today&apos;s Transaction Logs</TypographyH4>
       <ScrollArea className="h-[500px] border rounded-lg">
         <div className="flex flex-col gap-2 p-2">
           {transactionLogs.map((item) => (
