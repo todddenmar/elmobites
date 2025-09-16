@@ -25,39 +25,35 @@ import { serverTimestamp } from "firebase/firestore";
 import { toast } from "sonner";
 import SubmitLoadingButtons from "@/components/custom-ui/SubmitLoadingButtons";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
-import { TProduct, TInventory } from "@/typings";
+import { TInventory, TProductVariantItem } from "@/typings";
 import { dbSetDocument } from "@/lib/firebase/actions";
 
 // --------------------
 // Schema
 // --------------------
 const formSchema = z.object({
-  productID: z.string().min(1, "Select a product"),
-  variantID: z.string().min(1, "Select a variant"),
   branchID: z.string().min(1, "Select a branch"),
   stock: z.number().min(0, "Stock must be 0 or more"),
 });
 
 type CreateInventoryFormProps = {
   setClose: () => void;
+  productVariantItem: TProductVariantItem;
 };
 
 export default function CreateInventoryForm({
   setClose,
+  productVariantItem,
 }: CreateInventoryFormProps) {
-  const {
-    userData,
-    currentProducts,
-    currentStores,
-    setCurrentInventory,
-    currentInventory,
-  } = useAppStore();
+  const { userData, currentStores, setCurrentInventory, currentInventory } =
+    useAppStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<TProduct | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { productID: "", variantID: "", stock: 0 },
+    defaultValues: {
+      stock: 0,
+    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -69,8 +65,8 @@ export default function CreateInventoryForm({
     setIsLoading(true);
     const newInventory: TInventory = {
       id: crypto.randomUUID(),
-      productID: values.productID,
-      variantID: values.variantID,
+      productID: productVariantItem.productID,
+      variantID: productVariantItem.id,
       branchID: values.branchID, // ✅ save branch
       stock: values.stock,
       updatedAt: new Date().toISOString(),
@@ -114,61 +110,6 @@ export default function CreateInventoryForm({
                   {currentStores?.map((b) => (
                     <SelectItem key={b.id} value={b.id}>
                       {b.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* Select Product */}
-        <FormField
-          control={form.control}
-          name="productID"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Product</FormLabel>
-              <Select
-                onValueChange={(val) => {
-                  field.onChange(val);
-                  setSelectedProduct(
-                    currentProducts?.find((p) => p.id === val) || null
-                  );
-                }}
-                value={field.value}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select product" />
-                </SelectTrigger>
-                <SelectContent>
-                  {currentProducts?.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Select Variant */}
-        <FormField
-          control={form.control}
-          name="variantID"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Variant</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select variant" />
-                </SelectTrigger>
-                <SelectContent>
-                  {selectedProduct?.variants?.map((v) => (
-                    <SelectItem key={v.id} value={v.id}>
-                      {v.name} {v.size ? `(${v.size})` : ""} - ₱{v.price}
                     </SelectItem>
                   ))}
                 </SelectContent>

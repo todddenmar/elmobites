@@ -32,11 +32,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { convertCurrency, formatDate } from "@/lib/utils";
-import { TInventoryTableItem } from "@/typings";
+import { TInventoryListItem } from "@/typings";
 import InventoryActionButton from "./InventoryActionButton";
 
 type AdminInventoryTableProps = {
-  inventoryItems: TInventoryTableItem[];
+  inventoryItems: TInventoryListItem[];
 };
 export function AdminInventoryTable({
   inventoryItems,
@@ -50,7 +50,7 @@ export function AdminInventoryTable({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const columns: ColumnDef<TInventoryTableItem>[] = [
+  const columns: ColumnDef<TInventoryListItem>[] = [
     {
       id: "name",
       accessorFn: (row) => `${row.productName} ${row.variantName}`,
@@ -143,11 +143,13 @@ export function AdminInventoryTable({
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <div className="px-3">
-          {formatDate(new Date(row.getValue("updatedAt")), true)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const updatedAt = row.getValue("updatedAt") as string;
+        if (!updatedAt) return null;
+        return (
+          <div className="px-3">{formatDate(new Date(updatedAt), true)}</div>
+        );
+      },
     },
     {
       accessorKey: "createdAt",
@@ -162,11 +164,13 @@ export function AdminInventoryTable({
           </Button>
         );
       },
-      cell: ({ row }) => (
-        <div className="px-3">
-          {formatDate(new Date(row.getValue("createdAt")), true)}
-        </div>
-      ),
+      cell: ({ row }) => {
+        const createdAt = row.getValue("createdAt") as string;
+        if (!createdAt) return null;
+        return (
+          <div className="px-3">{formatDate(new Date(createdAt), true)}</div>
+        );
+      },
     },
     {
       id: "actions",

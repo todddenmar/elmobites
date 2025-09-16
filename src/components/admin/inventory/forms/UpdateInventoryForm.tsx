@@ -83,6 +83,7 @@ export default function UpdateInventoryForm({
     const updatedInventoryData = {
       ...inventoryData,
       ...values,
+      createdAt: inventoryData.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       timestamp: serverTimestamp(),
     };

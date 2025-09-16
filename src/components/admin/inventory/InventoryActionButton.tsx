@@ -1,6 +1,6 @@
 "use client";
 
-import { TInventoryTableItem } from "@/typings";
+import { TInventoryListItem } from "@/typings";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +25,7 @@ import { dbDeleteDocumentByID } from "@/lib/firebase/actions";
 import { useAppStore } from "@/lib/store";
 
 type InventoryActionButtonProps = {
-  inventoryData: TInventoryTableItem;
+  inventoryData: TInventoryListItem;
 };
 
 function InventoryActionButton({ inventoryData }: InventoryActionButtonProps) {

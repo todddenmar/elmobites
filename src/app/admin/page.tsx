@@ -125,7 +125,7 @@ function AdminPage() {
       <div className="grid grid-cols-1 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1 h-full ">
         <div className="flex xl:col-span-1 gap-4 flex-col bg-white p-4 rounded-lg h-full w-full 2xl:max-w-sm">
           <TypographyH4>Recent Orders</TypographyH4>
-          <ScrollArea className="flex-1 border rounded-lg p-2">
+          <ScrollArea className="border rounded-lg p-2 h-[500px]">
             <div className="space-y-2">
               {currentActiveOrders.map((item) => {
                 return (

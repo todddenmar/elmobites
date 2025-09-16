@@ -246,8 +246,58 @@ export const dbFetchCollectionWhere2 = async <T>({
     };
   }
 };
+export type TCollectionWhere1Props = {
+  collectionName: string;
+  where: {
+    fieldName: string;
+    fieldValue:
+      | string
+      | number
+      | boolean
+      | Timestamp
+      | (string | number | boolean | Timestamp)[];
+    operation: CustomWhereOp;
+  };
+};
+export const dbFetchCollectionWhere1 = async <T>({
+  collectionName,
+  where: where1,
+}: TCollectionWhere1Props) => {
+  try {
+    const constraints = [];
 
+    // handle first where
+    if (where1.operation === "between" && Array.isArray(where1.fieldValue)) {
+      const [start, end] = where1.fieldValue as [Timestamp, Timestamp];
+      constraints.push(
+        where(where1.fieldName, ">=", start),
+        where(where1.fieldName, "<=", end)
+      );
+    } else {
+      constraints.push(
+        where(
+          where1.fieldName,
+          where1.operation as WhereFilterOp,
+          where1.fieldValue
+        )
+      );
+    }
+    const q = query(collection(db, collectionName), ...constraints);
+    const querySnapshot = await getDocs(q);
 
+    const results: T[] = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as T[];
+
+    return { status: DB_METHOD_STATUS.SUCCESS, data: results };
+  } catch (e) {
+    return {
+      status: DB_METHOD_STATUS.ERROR,
+      message: e instanceof Error ? e.message : "An unknown error occurred",
+    };
+  }
+};
 
 export const dbUpdateDocument = async <T extends DocumentData>(
   collectionName: string,

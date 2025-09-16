@@ -48,6 +48,7 @@ export const DB_COLLECTION = {
   INVENTORY: "inventory",
   ORDERS: "orders",
   SETTINGS: "settings",
+  INVENTORY_TRANSACTIONS_LOGS: "inventory_transactions_logs",
 };
 
 export const OPTIONS_HOUR = Array.from({ length: 12 }, (_, index) => {

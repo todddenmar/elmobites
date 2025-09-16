@@ -8,7 +8,7 @@ import React from "react";
 function AdminStoresPage() {
   const { currentStores } = useAppStore();
   return (
-    <div className="flex flex-col gap-4 flex-1">
+    <div className="flex flex-col gap-4 flex-1 bg-white p-4 rounded-lg">
       <div className="flex justify-between items-center">
         <SectionTitle>Stores</SectionTitle>
 

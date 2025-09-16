@@ -89,6 +89,23 @@ export type TProductVariant = {
   imageURLs?: string[];
 };
 
+export type TProductVariantItem = TProductVariant & {
+  productID: string;
+  productName: string;
+  productCreatedAt: string;
+};
+
+export type TInventoryTransactionLog = {
+  id: string;
+  userID: string;
+  userName: string;
+  createdAt: string;
+  timestamp: FieldValue | string;
+  storeID: string;
+  message: string;
+  title: string;
+};
+
 export type TInventory = {
   id: string; // unique inventory record
   productID: string; // reference to TStore
@@ -100,7 +117,7 @@ export type TInventory = {
   timestamp: FieldValue | string;
 };
 
-export type TInventoryTableItem = TInventory & {
+export type TInventoryListItem = TInventory & {
   productName: string;
   branchName: string;
   variantName: string;

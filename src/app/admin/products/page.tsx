@@ -31,7 +31,7 @@ function AdminProductsPage() {
     setFilteredProducts(filtered);
   }, [selectedCategoryID, currentProducts]);
   return (
-    <div className="flex flex-col gap-4 flex-1 h-full">
+    <div className="flex flex-col gap-4 flex-1 h-full bg-white p-4 rounded-lg">
       <div className="flex justify-between items-center">
         <SectionTitle>Products</SectionTitle>
 
