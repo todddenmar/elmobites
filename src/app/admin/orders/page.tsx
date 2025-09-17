@@ -2,6 +2,7 @@
 import { AdminOrdersTable } from "@/components/admin/orders/AdminOrdersTable";
 import SectionTitle from "@/components/custom-ui/SectionTitle";
 import { db } from "@/firebase";
+import { useAppStore } from "@/lib/store";
 import { TOrder, TOrderTableItem } from "@/typings";
 import { endOfMonth, startOfMonth } from "date-fns";
 import {
@@ -14,6 +15,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 function AdminOrdersPage() {
+  const { currentStores } = useAppStore();
   const [monthlyOrders, setMonthlyOrders] = useState<TOrderTableItem[]>([]);
   useEffect(() => {
     const start = Timestamp.fromDate(startOfMonth(new Date()));
@@ -33,10 +35,14 @@ function AdminOrdersPage() {
         orders.map((item) => ({
           ...item,
           customerName: item.customer.fullName,
+          storeName:
+            currentStores.find((s) => s.id === item.branchID)?.name || "",
+          referenceNumber: item.payment.referenceNumber || "",
         }))
       );
     });
     return () => unsubscribe(); // Cleanup on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div className="flex flex-col gap-4 flex-1 h-full bg-white p-4 rounded-lg">

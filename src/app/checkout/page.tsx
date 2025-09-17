@@ -34,7 +34,13 @@ import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
 import dynamic from "next/dynamic";
-import { increment, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  getCountFromServer,
+  increment,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
 import { Input } from "@/components/ui/input";
 import { getAuth, signInAnonymously } from "firebase/auth";
 import ReceiptScreenshotUpload from "@/components/custom-ui/ReceiptScreenshotUpload";
@@ -45,6 +51,7 @@ import PaymentDetailsItem from "@/components/custom-ui/PaymentDetailsItem";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangleIcon } from "lucide-react";
+import { db } from "@/firebase";
 
 // ...
 const MapWithMarker = dynamic(
@@ -130,7 +137,7 @@ function CheckoutPage() {
     useState<TPaymentDetails | null>(null);
   const isDelivery = deliveryOption === "delivery";
   const total = customerCart
-    ? customerCart.total + (isDelivery ? DELIVERY_FEE : 0)
+    ? Number(customerCart.total) + (isDelivery ? Number(DELIVERY_FEE) : 0)
     : 0;
   const isInPagadianCity = (lat: number, lng: number): boolean => {
     return lat >= 7.799 && lat <= 7.883 && lng >= 123.399 && lng <= 123.525;
@@ -170,6 +177,13 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentOption]);
 
+  const countTotalOrders = async () => {
+    const coll = collection(db, DB_COLLECTION.ORDERS);
+    const q = query(coll);
+    const snapshot = await getCountFromServer(q);
+    return snapshot.data().count;
+  };
+
   const onConfirmOrder = async () => {
     if (!customerCart) return;
     if (!selectedPaymentDetails) {
@@ -191,8 +205,10 @@ function CheckoutPage() {
     }));
 
     // build order
+    const orderNumber = await countTotalOrders();
     const order: TOrder = {
       id: crypto.randomUUID(),
+      orderNumber: orderNumber + 1,
       emailAddress: email,
       branchID: customerCart.items[0]?.branchID ?? "unknown",
       items,
@@ -200,6 +216,7 @@ function CheckoutPage() {
       paymentMethod: "CASH", // you can make this dynamic later
       status: "PENDING",
       orderType: isDelivery ? "DELIVERY" : "PICKUP",
+      paymentStatus: "UNPAID",
       customer: {
         firstName,
         lastName,
@@ -241,10 +258,17 @@ function CheckoutPage() {
     toast.success("Order successfully created");
 
     if (currentSettings.managerEmail) {
-      await onSendOrderEmail({
-        order: order,
-        email: currentSettings.managerEmail,
-      });
+      if (process.env.NODE_ENV === "production") {
+        await onSendOrderEmail({
+          order: order,
+          email: currentSettings.managerEmail,
+        });
+      } else {
+        await onSendOrderEmail({
+          order: order,
+          email: "todddenmar@gmail.com",
+        });
+      }
     }
     router.push("/orders/" + order.id);
     setCustomerCart(null);

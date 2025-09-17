@@ -69,7 +69,7 @@ export default function OrderDetailPage() {
       >
         <ArrowLeftIcon /> Back to My Orders
       </Button>
-      <TypographyH4>Order #{order.id}</TypographyH4>
+      <TypographyH4>Order #{order.orderNumber}</TypographyH4>
 
       {/* Responsive layout */}
       <div className="flex flex-col lg:flex-row gap-6">

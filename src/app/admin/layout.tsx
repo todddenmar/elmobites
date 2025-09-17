@@ -2,27 +2,50 @@
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import LoadingComponent from "@/components/custom-ui/LoadingComponent";
 import { useAppStore } from "@/lib/store";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import ErrorCard from "@/components/custom-ui/ErrorCard"; // ✅ make sure this is imported
 
 function AdminRootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  type Status = "loading" | "ready" | "error" | "unauthorized";
+
+  const [status, setStatus] = useState<Status>("loading");
   const { userData } = useAppStore();
-  const router = useRouter();
+
   useEffect(() => {
-    const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
-    const isAdmin = userData ? adminEmails.includes(userData?.email) : false;
-    if (!isAdmin) {
-      router.push("/");
+    const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",") || [];
+    if (!userData) {
+      setStatus("unauthorized");
       return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const isAdmin = adminEmails.includes(userData.email);
+    if (!isAdmin) {
+      setStatus("unauthorized");
+    } else {
+      setStatus("ready");
+    }
   }, [userData]);
-  if (!userData) {
-    return <LoadingComponent />;
+
+  if (status === "loading") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[600px] w-full">
+        <LoadingComponent />
+      </div>
+    );
+  }
+
+  if (status === "unauthorized") {
+    return (
+      <ErrorCard
+        title="Unauthorized"
+        description="You have no access."
+        linkText="Go Back"
+        redirectionLink="/"
+      />
+    );
   }
 
   return (

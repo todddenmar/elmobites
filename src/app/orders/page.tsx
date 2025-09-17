@@ -47,7 +47,7 @@ export default function OrdersPage() {
               className="border text-sm rounded-lg p-4 flex justify-between items-center"
             >
               <div>
-                <p>Order #{order.id}</p>
+                <p>Order #{order.orderNumber}</p>
                 <p className="text-muted-foreground text-xs">
                   {order.status} • {new Date(order.createdAt).toLocaleString()}
                 </p>

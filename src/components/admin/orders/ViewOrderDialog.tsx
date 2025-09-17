@@ -64,7 +64,7 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <TypographyH4>Order #{order.id}</TypographyH4>
+      <TypographyH4>Order #{order.orderNumber}</TypographyH4>
 
       <ScrollArea className="h-[450px] pr-2">
         <div className="space-y-6">
