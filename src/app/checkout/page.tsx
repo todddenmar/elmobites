@@ -226,9 +226,6 @@ function CheckoutPage() {
           : null,
     };
 
-    console.log("Order Data:", order);
-    return;
-
     const res = await dbSetDocument({
       collectionName: DB_COLLECTION.ORDERS,
       id: order.id,

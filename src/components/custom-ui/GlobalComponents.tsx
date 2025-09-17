@@ -1,6 +1,7 @@
 import { TAdminLink } from "@/typings";
 import {
   CakeIcon,
+  ClipboardListIcon,
   CogIcon,
   FileBoxIcon,
   LayoutDashboardIcon,
@@ -15,6 +16,12 @@ export const adminLinks: TAdminLink[] = [
     label: "Dashboard",
     path: "/admin",
     icon: <LayoutDashboardIcon size={iconSize} />,
+  },
+  {
+    id: "orders",
+    label: "Orders",
+    path: "/admin/orders",
+    icon: <ClipboardListIcon size={iconSize} />,
   },
   {
     id: "stores",

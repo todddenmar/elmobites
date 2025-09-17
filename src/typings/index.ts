@@ -198,6 +198,11 @@ export type TOrder = {
     receiptImage: TImageReceipt | null;
   };
   occasion: string | null;
+  isFullfilled?: boolean;
+};
+
+export type TOrderTableItem = TOrder & {
+  customerName: string;
 };
 
 export type TCustomerDetails = {
