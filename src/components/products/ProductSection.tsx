@@ -29,7 +29,6 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { toast } from "sonner";
 import ProductBranchMapDialog from "./ProductBranchMapDialog";
-import { isBranchClosed } from "@/lib/config";
 type ProductSectionProps = {
   product: TProduct;
   category: TProductCategory | null;
@@ -167,80 +166,144 @@ function ProductSection({ product, category }: ProductSectionProps) {
       )
     : [];
 
-  const renderButtons = () => {
-    if (!selectedBranchID) {
-      return <EmptyLayout>Select a branch</EmptyLayout>;
-    }
+    type BranchStatusProps = {
+      openingTime: string; // "HH:mm"
+      closingTime: string; // "HH:mm"
+    };
 
-    const storeData = currentStores.find(
-      (item) => item.id === selectedBranchID
-    );
-    if (storeData) {
-      const closed = isBranchClosed(storeData.closingTime);
-      if (closed) {
-        return (
-          <EmptyLayout>
-            <p className="text-muted-foreground text-center font-medium">
-              This branch is already closed
-            </p>
-          </EmptyLayout>
-        );
+    const BranchStatus: React.FC<BranchStatusProps> = ({
+      openingTime,
+      closingTime,
+    }) => {
+      if (!openingTime || !closingTime) return null;
+
+      const now = new Date();
+      console.log({ openingTime, closingTime });
+
+      const [openHour, openMinute] = openingTime.split(":").map(Number);
+      const [closeHour, closeMinute] = closingTime.split(":").map(Number);
+
+      const openDate = new Date();
+      openDate.setHours(openHour, openMinute, 0, 0);
+
+      const closeDate = new Date();
+      closeDate.setHours(closeHour, closeMinute, 0, 0);
+
+      let message: string | null = null;
+
+      if (closeDate <= openDate) {
+        // 🕑 Branch closes after midnight (e.g. 18:00 → 02:00)
+        if (now < openDate && now > closeDate) {
+          message = `Our store will open at ${openingTime}`;
+        }
+      } else {
+        // ✅ Normal same-day schedule
+        if (now < openDate) {
+          message = `Our store will open at ${openingTime}`;
+        } else if (now > closeDate) {
+          message = `Our store is already closed`;
+        }
       }
-    }
 
-    if (maxStock < 1) {
+      if (!message) return null; // currently open
+
       return (
-        <EmptyLayout>
-          <p className="text-sm text-muted-foreground">
-            {maxStock > 0 ? `${maxStock} in stock` : "Out of stock"}
-          </p>
-        </EmptyLayout>
-      );
-    }
-
-    return (
-      <div className="grid gap-4 sticky bottom-0 py-4 bg-white left-0 right-0 h-fit">
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            onClick={onAddToCart}
-            className="w-full cursor-pointer"
-            type="button"
-            size={"lg"}
-            variant={"outline"}
-          >
-            <ShoppingCartIcon /> Add To Cart
-          </Button>
-          {customerCart ? (
-            customerCart.items.length > 0 ? (
-              <CartButton isContinue />
-            ) : (
-              <Link href={"/checkout"}>
-                <Button
-                  onClick={onAddToCart}
-                  className="w-full cursor-pointer"
-                  type="button"
-                  size={"lg"}
-                >
-                  Buy Now
-                </Button>
-              </Link>
-            )
-          ) : (
-            <Link href={"/checkout"}>
-              <Button
-                onClick={onAddToCart}
-                className="w-full cursor-pointer"
-                type="button"
-                size={"lg"}
-              >
-                Buy Now
-              </Button>
-            </Link>
-          )}
+        <div className="p-3 text-sm text-center rounded-md bg-red-100 text-red-700">
+          {message}
         </div>
-      </div>
-    );
-  };
+      );
+    };
+    const isStoreOpen = (openingTime: string, closingTime: string) => {
+      const now = new Date();
+      const [openHour, openMinute] = openingTime.split(":").map(Number);
+      const [closeHour, closeMinute] = closingTime.split(":").map(Number);
+
+      const open = new Date();
+      open.setHours(openHour, openMinute, 0, 0);
+
+      const close = new Date();
+      close.setHours(closeHour, closeMinute, 0, 0);
+
+      return now >= open && now <= close;
+    };
+
+    const renderButtons = () => {
+      if (!selectedBranchID) {
+        return <EmptyLayout>Select a branch</EmptyLayout>;
+      }
+
+      const storeData = currentStores.find(
+        (item) => item.id === selectedBranchID
+      );
+
+      if (!storeData) {
+        return <EmptyLayout>Branch not found</EmptyLayout>;
+      }
+
+      const isOpen = isStoreOpen(storeData.openingTime, storeData.closingTime);
+
+      return (
+        <>
+          <BranchStatus
+            openingTime={storeData.openingTime}
+            closingTime={storeData.closingTime}
+          />
+
+          {isOpen ? (
+            maxStock < 1 ? (
+              <EmptyLayout>
+                <p className="text-sm text-muted-foreground">
+                  {maxStock > 0 ? `${maxStock} in stock` : "Out of stock"}
+                </p>
+              </EmptyLayout>
+            ) : (
+              <div className="grid gap-4 sticky bottom-0 py-4 bg-white left-0 right-0 h-fit">
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    onClick={onAddToCart}
+                    className="w-full cursor-pointer"
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                  >
+                    <ShoppingCartIcon /> Add To Cart
+                  </Button>
+                  {customerCart ? (
+                    customerCart.items.length > 0 ? (
+                      <CartButton isContinue />
+                    ) : (
+                      <Link href={"/checkout"}>
+                        <Button
+                          onClick={onAddToCart}
+                          className="w-full cursor-pointer"
+                          type="button"
+                          size="lg"
+                        >
+                          Buy Now
+                        </Button>
+                      </Link>
+                    )
+                  ) : (
+                    <Link href={"/checkout"}>
+                      <Button
+                        onClick={onAddToCart}
+                        className="w-full cursor-pointer"
+                        type="button"
+                        size="lg"
+                      >
+                        Buy Now
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            )
+          ) : null}
+        </>
+      );
+    };
+
+
 
   return (
     <div>

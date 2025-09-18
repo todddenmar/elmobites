@@ -58,17 +58,30 @@ export const OPTIONS_HOUR = Array.from({ length: 12 }, (_, index) => {
     label: `${hour}`,
   };
 });
-export const isBranchClosed = (closingTime: string): boolean => {
-  if (!closingTime) return false;
+export const isBranchClosed = (
+  openingTime: string, // "HH:mm"
+  closingTime: string // "HH:mm"
+): boolean => {
+  if (!openingTime || !closingTime) return false;
+
   const now = new Date();
+  const [openHour, openMinute] = openingTime.split(":").map(Number);
+  const [closeHour, closeMinute] = closingTime.split(":").map(Number);
 
-  // Parse "HH:mm"
-  const [hours, minutes] = closingTime.split(":").map(Number);
+  const openDate = new Date();
+  openDate.setHours(openHour, openMinute, 0, 0);
 
-  const closingDate = new Date();
-  closingDate.setHours(hours, minutes, 0, 0);
+  const closeDate = new Date();
+  closeDate.setHours(closeHour, closeMinute, 0, 0);
 
-  return now > closingDate;
+  // ✅ Handle branches that close after midnight (e.g. open 18:00, close 02:00)
+  if (closeDate <= openDate) {
+    // If it's after opening OR before closing (next day), branch is open
+    return !(now >= openDate || now <= closeDate);
+  }
+
+  // ✅ Normal case (same-day closing)
+  return now < openDate || now > closeDate;
 };
 export const OPTIONS_MINUTE = Array.from({ length: 12 }, (_, index) => {
   const minute = index * 5; // Generates 0, 5, 10, ..., 55
