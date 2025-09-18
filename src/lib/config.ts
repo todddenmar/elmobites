@@ -58,7 +58,18 @@ export const OPTIONS_HOUR = Array.from({ length: 12 }, (_, index) => {
     label: `${hour}`,
   };
 });
+export const isBranchClosed = (closingTime: string): boolean => {
+  if (!closingTime) return false;
+  const now = new Date();
 
+  // Parse "HH:mm"
+  const [hours, minutes] = closingTime.split(":").map(Number);
+
+  const closingDate = new Date();
+  closingDate.setHours(hours, minutes, 0, 0);
+
+  return now > closingDate;
+};
 export const OPTIONS_MINUTE = Array.from({ length: 12 }, (_, index) => {
   const minute = index * 5; // Generates 0, 5, 10, ..., 55
   return {

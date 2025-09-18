@@ -1,5 +1,6 @@
 "use client";
 import { AdminProductsTable } from "@/components/admin/products/AdminProductsTable";
+import ProductCategoryActionButton from "@/components/admin/products/categories/ProductCategoryActionButton";
 import ProductCategoryCreateButton from "@/components/admin/products/categories/ProductCategoryCreateButton";
 import ProductCreateButton from "@/components/admin/products/ProductCreateButton";
 import EmptyLayout from "@/components/custom-ui/EmptyLayout";
@@ -54,12 +55,18 @@ function AdminProductsPage() {
                         key={`category-${item.id}`}
                         onClick={() => setSelectedCategoryID(item.id)}
                         className={cn(
-                          "border rounded-lg cursor-pointer p-2 text-sm",
+                          "border rounded-lg relative cursor-pointer p-2 text-sm",
                           isActive ? "bg-black text-white" : "hover:bg-black/5"
                         )}
                       >
-                        <div className="font-semibold">{item.name}</div>
-                        <div className="text-xs">{item.tags}</div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="font-semibold">{item.name}</div>
+
+                            <div className="text-xs">{item.tags}</div>
+                          </div>
+                          <ProductCategoryActionButton categoryData={item} />
+                        </div>
                       </div>
                     );
                   })}

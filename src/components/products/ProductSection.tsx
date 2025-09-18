@@ -29,6 +29,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { toast } from "sonner";
 import ProductBranchMapDialog from "./ProductBranchMapDialog";
+import { isBranchClosed } from "@/lib/config";
 type ProductSectionProps = {
   product: TProduct;
   category: TProductCategory | null;
@@ -165,12 +166,36 @@ function ProductSection({ product, category }: ProductSectionProps) {
         new Map(inventory.map((item) => [item.branchID, item])).values()
       )
     : [];
+
   const renderButtons = () => {
-    if (maxStock < 1) {
-      return null;
-    }
     if (!selectedBranchID) {
       return <EmptyLayout>Select a branch</EmptyLayout>;
+    }
+
+    const storeData = currentStores.find(
+      (item) => item.id === selectedBranchID
+    );
+    if (storeData) {
+      const closed = isBranchClosed(storeData.closingTime);
+      if (closed) {
+        return (
+          <EmptyLayout>
+            <p className="text-muted-foreground text-center font-medium">
+              This branch is already closed
+            </p>
+          </EmptyLayout>
+        );
+      }
+    }
+
+    if (maxStock < 1) {
+      return (
+        <EmptyLayout>
+          <p className="text-sm text-muted-foreground">
+            {maxStock > 0 ? `${maxStock} in stock` : "Out of stock"}
+          </p>
+        </EmptyLayout>
+      );
     }
 
     return (
@@ -348,9 +373,6 @@ function ProductSection({ product, category }: ProductSectionProps) {
                       +
                     </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {maxStock > 0 ? `${maxStock} in stock` : "Out of stock"}
-                  </p>
                 </div>
 
                 {renderButtons()}
