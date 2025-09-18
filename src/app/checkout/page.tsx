@@ -658,7 +658,7 @@ function CheckoutPage() {
                   )}
                   {paymentOption != "CASH" ? (
                     <div className="grid grid-cols-1 gap-2">
-                      <Label>Reference Number</Label>
+                      <Label>Last 5 Digits of Reference Number</Label>
                       <Input
                         value={referenceNumber}
                         onChange={(val) => setReferenceNumber(val.target.value)}
