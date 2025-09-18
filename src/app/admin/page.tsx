@@ -1,4 +1,5 @@
 "use client";
+import { CompletedOrdersTable } from "@/components/admin/dashboard/CompletedOrdersTable";
 import RecentOrderItem from "@/components/admin/orders/RecentOrderItem";
 import { TypographyH4 } from "@/components/custom-ui/typography";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -29,7 +30,8 @@ import {
 } from "lucide-react";
 import React, { ReactNode, useEffect, useState } from "react";
 function AdminPage() {
-  const { currentActiveOrders, setCurrentActiveOrders } = useAppStore();
+  const { currentActiveOrders, setCurrentActiveOrders, currentStores } =
+    useAppStore();
   const [salesToday, setSalesToday] = useState(0);
   const [totalActive, setTotalActive] = useState(0);
   const [totalCompleted, setTotalCompleted] = useState(0);
@@ -140,18 +142,17 @@ function AdminPage() {
         </div>
         <div className="flex-1 xl:col-span-2 2xl:col-span-3 flex flex-col gap-4 bg-white p-4 rounded-lg h-full">
           <TypographyH4>Completed Orders Today</TypographyH4>
-          <ScrollArea className="flex-1 border rounded-lg p-2">
-            <div className="space-y-2">
-              {completedOrdersToday.map((item) => {
-                return (
-                  <RecentOrderItem
-                    key={`active-orders-${item.id}`}
-                    order={item}
-                  />
-                );
-              })}
-            </div>
-          </ScrollArea>
+          <div>
+            <CompletedOrdersTable
+              orders={completedOrdersToday.map((item) => ({
+                ...item,
+                customerName: item.customer.fullName,
+                storeName:
+                  currentStores.find((s) => s.id === item.branchID)?.name || "",
+                referenceNumber: item.payment.referenceNumber || "",
+              }))}
+            />
+          </div>
         </div>
       </div>
     </div>

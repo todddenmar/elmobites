@@ -13,6 +13,7 @@ import { useAppStore } from "@/lib/store";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 // dynamically import map
 const MapWithMarker = dynamic(
@@ -79,6 +80,11 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                 {order.customer.fullName}
               </p>
               <p>
+                <span className="font-medium">Mobile Number:</span>{" "}
+                {order.customer.mobileNumber}
+              </p>
+
+              <p>
                 <span className="font-medium">Payment:</span>{" "}
                 {order.paymentMethod}
               </p>
@@ -98,6 +104,18 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                 <span className="font-medium">Option:</span>{" "}
                 {order.orderType === "DELIVERY" ? "Delivery" : "Pick-up"}
               </p>
+
+              <ScrollArea className="h-[400px] p-4 rounded-lg border">
+                {order.payment.receiptImage?.url ? (
+                  <Image
+                    width={400}
+                    height={400}
+                    src={order.payment.receiptImage?.url}
+                    className="object-contain"
+                    alt={"receipt-" + order.payment.referenceNumber}
+                  />
+                ) : null}
+              </ScrollArea>
             </CardContent>
           </Card>
 
@@ -136,6 +154,12 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                 <CardTitle>Delivery Location</CardTitle>
               </CardHeader>
               <CardContent>
+                <p>
+                  <span className="font-medium">
+                    Delivery Location Details:
+                  </span>{" "}
+                  {order.locationDetails}
+                </p>
                 <div className="h-64 w-full rounded-lg overflow-hidden">
                   <MapWithMarker
                     position={[

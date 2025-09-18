@@ -34,13 +34,13 @@ import {
 import { convertCurrency, formatDate } from "@/lib/utils";
 import { TOrderPaymentStatus, TOrderTableItem } from "@/typings";
 import { Badge } from "@/components/ui/badge";
-import AdminOrdersActionButton from "./AdminOrdersActionButton";
-import ViewReceiptDialog from "./ViewReceiptDialog";
+import AdminOrdersActionButton from "../orders/AdminOrdersActionButton";
+import ViewReceiptDialog from "../orders/ViewReceiptDialog";
 
-type AdminOrdersTableProps = {
+type CompletedOrdersTableProps = {
   orders: TOrderTableItem[];
 };
-export function AdminOrdersTable({ orders }: AdminOrdersTableProps) {
+export function CompletedOrdersTable({ orders }: CompletedOrdersTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

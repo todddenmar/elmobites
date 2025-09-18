@@ -194,6 +194,7 @@ export type TOrderStatus =
       latitude: number;
       longitude: number;
     } | null;
+    locationDetails: string;
     customer: TCustomerDetails;
     payment: {
       option: TPaymentDetails;

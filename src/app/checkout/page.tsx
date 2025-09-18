@@ -213,10 +213,11 @@ function CheckoutPage() {
       branchID: customerCart.items[0]?.branchID ?? "unknown",
       items,
       totalAmount: total,
-      paymentMethod: "CASH", // you can make this dynamic later
+      paymentMethod: paymentOption, // you can make this dynamic later
       status: "PENDING",
       orderType: isDelivery ? "DELIVERY" : "PICKUP",
       paymentStatus: "UNPAID",
+      locationDetails: locationDetails || "",
       customer: {
         firstName,
         lastName,
