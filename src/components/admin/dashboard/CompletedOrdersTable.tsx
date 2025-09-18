@@ -195,23 +195,6 @@ export function CompletedOrdersTable({ orders }: CompletedOrdersTableProps) {
       },
     },
     {
-      accessorKey: "storeName",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Branch
-            <ArrowUpDown />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="px-3 capitalize">{row.getValue("storeName")}</div>
-      ),
-    },
-    {
       accessorKey: "orderType",
       header: ({ column }) => {
         return (

@@ -8,7 +8,7 @@ import { adminLinks } from "../custom-ui/GlobalComponents";
 function AdminSidebar() {
   const pathname = usePathname();
   return (
-    <div className="w-[300px] h-full hidden lg:block">
+    <div className="w-fit h-full hidden lg:block group">
       <div className="h-full flex flex-col">
         <ul>
           {adminLinks.map((item) => {
@@ -41,10 +41,17 @@ type AdminSidebarItemProps = {
 };
 function AdminSidebarItem({ props }: AdminSidebarItemProps) {
   return (
-    <Link href={props.path}>
-      <div className="px-4 py-3 flex gap-2  items-center">
+    <Link href={props.path} className="block">
+      <div className="px-4 py-3 flex items-center">
         <div>{props.icon}</div>
-        <div>{props.label}</div>
+        <div
+          className={cn(
+            "overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out",
+            "opacity-0 w-0 group-hover:opacity-100 group-hover:w-32 group-hover:pl-2"
+          )}
+        >
+          {props.label}
+        </div>
       </div>
     </Link>
   );

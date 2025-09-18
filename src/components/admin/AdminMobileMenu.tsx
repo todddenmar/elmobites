@@ -54,7 +54,9 @@ function AdminMobileMenu() {
                           : "hover:bg-black/5"
                       )}
                     >
-                      <Link href={item.path}>{item.label}</Link>
+                      <Link href={item.path} className="block">
+                        {item.label}
+                      </Link>
                     </li>
                   );
                 })}

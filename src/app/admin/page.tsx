@@ -100,7 +100,7 @@ function AdminPage() {
     fetchDashboardData();
   }, [currentActiveOrders]);
   return (
-    <div className="flex-1 flex flex-col gap-4 h-full">
+    <div className="flex-1 flex flex-col gap-4 h-full p-4 lg:p-0">
       <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-4">
         <OverviewCard
           title="Total Sales Today"
@@ -125,7 +125,7 @@ function AdminPage() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1 h-full ">
-        <div className="flex xl:col-span-1 gap-4 flex-col bg-white p-4 rounded-lg h-full w-full 2xl:max-w-sm">
+        <div className="flex xl:col-span-1 gap-4 flex-col bg-white p-4 rounded-lg h-full w-full">
           <TypographyH4>Recent Orders</TypographyH4>
           <ScrollArea className="border rounded-lg p-2 h-[500px]">
             <div className="space-y-2">

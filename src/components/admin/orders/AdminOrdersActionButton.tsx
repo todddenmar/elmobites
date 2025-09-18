@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { MoreVertical } from "lucide-react";
 import OrderStatusForm from "./forms/OrderStatusForm";
+import ViewOrderDialog from "./ViewOrderDialog";
 
 type AdminOrdersActionButtonProps = {
   orderData: TOrder;
@@ -26,6 +27,7 @@ type AdminOrdersActionButtonProps = {
 function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
   const [open, setOpen] = useState(false);
   const [isOpenStatus, setIsOpenStatus] = useState(false);
+  const [isOpenOrder, setIsOpenOrder] = useState(false);
 
   return (
     <>
@@ -44,6 +46,14 @@ function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
           >
             Update Status
           </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              setIsOpenOrder(true);
+              setOpen(false);
+            }}
+          >
+            Order Details
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -56,6 +66,15 @@ function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
             </DialogDescription>
           </DialogHeader>
           <OrderStatusForm orderData={orderData} />
+        </DialogContent>
+      </Dialog>
+      <Dialog open={isOpenOrder} onOpenChange={setIsOpenOrder}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Order #{orderData.orderNumber}</DialogTitle>
+            <DialogDescription>Order details</DialogDescription>
+          </DialogHeader>
+          <ViewOrderDialog order={orderData} />
         </DialogContent>
       </Dialog>
     </>

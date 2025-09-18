@@ -51,7 +51,7 @@ function AdminOrdersPage() {
 
         <div className="flex justify-between gap-4"></div>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 grid">
         <AdminOrdersTable orders={monthlyOrders} />
       </div>
     </div>

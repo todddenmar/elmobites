@@ -11,7 +11,6 @@ import { convertCurrency } from "@/lib/utils";
 import { dbUpdateDocument } from "@/lib/firebase/actions";
 import { useAppStore } from "@/lib/store";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 
@@ -64,17 +63,14 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
 
   return (
     <div className="space-y-6">
-      {/* Title */}
-      <TypographyH4>Order #{order.orderNumber}</TypographyH4>
-
       <ScrollArea className="h-[450px] pr-2">
         <div className="space-y-6">
           {/* Order Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
+          <div>
+            <div>
+              <TypographyH4>Order Summary</TypographyH4>
+            </div>
+            <div className="space-y-2 text-sm">
               <p>
                 <span className="font-medium">Customer:</span>{" "}
                 {order.customer.fullName}
@@ -101,7 +97,7 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                 {convertCurrency(order.totalAmount)}
               </p>
               <p>
-                <span className="font-medium">Option:</span>{" "}
+                <span className="font-medium">Order Type:</span>{" "}
                 {order.orderType === "DELIVERY" ? "Delivery" : "Pick-up"}
               </p>
 
@@ -116,15 +112,15 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                   />
                 ) : null}
               </ScrollArea>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Items */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Items</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
+          <div>
+            <div>
+              <TypographyH4>Items</TypographyH4>
+            </div>
+            <div className="space-y-3 text-sm">
               {order.items.map((item) => (
                 <div
                   key={item.id}
@@ -144,16 +140,16 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                   </p>
                 </div>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Delivery Map */}
           {order.orderType === "DELIVERY" && order.coordinates && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Delivery Location</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div>
+              <div>
+                <TypographyH4>Delivery Location</TypographyH4>
+              </div>
+              <div>
                 <p>
                   <span className="font-medium">
                     Delivery Location Details:
@@ -170,16 +166,16 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                     isMarkerDraggable={false}
                   />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
 
           {/* Status Update */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Update Status</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div>
+            <div>
+              <TypographyH4>Update Status</TypographyH4>
+            </div>
+            <div>
               <div className="flex flex-wrap gap-2">
                 {STATUS_FLOW.map((status) => (
                   <Button
@@ -192,8 +188,8 @@ export default function ViewOrderDialog({ order }: ViewOrderDialogProps) {
                   </Button>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </ScrollArea>
     </div>
