@@ -21,7 +21,7 @@ function AdminRootLayout({
       setStatus("unauthorized");
       return;
     }
-    const isAdmin = adminEmails.includes(userData.email);
+    const isAdmin = adminEmails.find((item) => item.includes(userData.email));
     if (!isAdmin) {
       setStatus("unauthorized");
     } else {
