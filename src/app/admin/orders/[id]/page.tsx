@@ -82,9 +82,6 @@ function AdminOrderPage() {
               Placed on {new Date(order.createdAt).toLocaleString()}
             </p>
           </div>
-          <Button asChild variant="link" className="mt-2 md:mt-0">
-            <Link href="#">View Invoice</Link>
-          </Button>
         </div>
 
         {/* Main Content */}
@@ -118,7 +115,7 @@ function AdminOrderPage() {
                 ))}
               </CardContent>
             </Card>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid lg:grid-cols-2 gap-4">
               {/* Summary */}
               <Card>
                 <CardHeader>
