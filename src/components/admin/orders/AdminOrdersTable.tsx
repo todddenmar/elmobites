@@ -36,6 +36,7 @@ import { TOrderPaymentStatus, TOrderTableItem } from "@/typings";
 import { Badge } from "@/components/ui/badge";
 import AdminOrdersActionButton from "./AdminOrdersActionButton";
 import ViewReceiptDialog from "./ViewReceiptDialog";
+import Link from "next/link";
 
 type AdminOrdersTableProps = {
   orders: TOrderTableItem[];
@@ -66,7 +67,13 @@ export function AdminOrdersTable({ orders }: AdminOrdersTableProps) {
       },
       cell: ({ row }) => {
         const orderNumber: string = row.getValue("orderNumber");
-        return <div className="px-3 capitalize">#{orderNumber}</div>;
+        return (
+          <div className="px-3 capitalize">
+            <Link href={"/admin/orders/" + row.original.id}>
+              #{orderNumber}
+            </Link>
+          </div>
+        );
       },
     },
     {

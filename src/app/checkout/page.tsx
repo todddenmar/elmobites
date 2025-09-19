@@ -232,6 +232,7 @@ function CheckoutPage() {
         referenceNumber: referenceNumber || null,
         receiptImage: receiptImage || null,
       },
+      deliveryFee: currentSettings.deliveryFee || 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       timestamp: serverTimestamp(),

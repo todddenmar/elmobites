@@ -205,6 +205,7 @@ export type TOrderStatus =
     isFulfilled?: boolean;
     paymentStatus: TOrderPaymentStatus;
     logs?: TOrderLog[]; // ✅ keep history of changes
+    deliveryFee: number;
   };
   export type TOrderLog = {
     status: TOrderStatus;
