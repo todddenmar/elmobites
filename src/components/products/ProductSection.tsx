@@ -248,15 +248,11 @@ function ProductSection({ product, category }: ProductSectionProps) {
             openingTime={storeData.openingTime}
             closingTime={storeData.closingTime}
           />
-
+          <p className="text-sm text-muted-foreground">
+            {maxStock > 0 ? `${maxStock} in stock` : "Out of stock"}
+          </p>
           {isOpen ? (
-            maxStock < 1 ? (
-              <EmptyLayout>
-                <p className="text-sm text-muted-foreground">
-                  {maxStock > 0 ? `${maxStock} in stock` : "Out of stock"}
-                </p>
-              </EmptyLayout>
-            ) : (
+            maxStock < 1 ? null : (
               <div className="grid gap-4 sticky bottom-0 py-4 bg-white left-0 right-0 h-fit">
                 <div className="grid grid-cols-2 gap-4">
                   <Button

@@ -6,6 +6,7 @@ import {
   FileBoxIcon,
   LayoutDashboardIcon,
   StoreIcon,
+  UsersIcon,
 } from "lucide-react";
 import React from "react";
 const iconSize = 18;
@@ -23,12 +24,7 @@ export const adminLinks: TAdminLink[] = [
     path: "/admin/orders",
     icon: <ClipboardListIcon size={iconSize} />,
   },
-  {
-    id: "stores",
-    label: "Stores",
-    path: "/admin/stores",
-    icon: <StoreIcon size={iconSize} />,
-  },
+
   {
     id: "products",
     label: "Products",
@@ -40,6 +36,18 @@ export const adminLinks: TAdminLink[] = [
     label: "Inventory",
     path: "/admin/inventory",
     icon: <FileBoxIcon size={iconSize} />,
+  },
+  {
+    id: "stores",
+    label: "Stores",
+    path: "/admin/stores",
+    icon: <StoreIcon size={iconSize} />,
+  },
+  {
+    id: "employees",
+    label: "Employees",
+    path: "/admin/employees",
+    icon: <UsersIcon size={iconSize} />,
   },
   {
     id: "settings",

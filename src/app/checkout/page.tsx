@@ -260,17 +260,13 @@ function CheckoutPage() {
     toast.success("Order successfully created");
 
     if (currentSettings.managerEmail) {
-      if (process.env.NODE_ENV === "production") {
-        await onSendOrderEmail({
-          order: order,
-          email: currentSettings.managerEmail,
-        });
-      } else {
-        await onSendOrderEmail({
-          order: order,
-          email: "todddenmar@gmail.com",
-        });
-      }
+      await onSendOrderEmail({
+        order: order,
+        email:
+          process.env.NODE_ENV === "production"
+            ? currentSettings.managerEmail
+            : "todddenmar@gmail.com",
+      });
     }
     router.push("/orders/" + order.id);
     setCustomerCart(null);

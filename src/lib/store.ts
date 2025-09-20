@@ -8,6 +8,8 @@ import {
   TCart,
   TOrder,
   TSettings,
+  TEmployee,
+  TPosition,
 } from "@/typings";
 import { create } from "zustand";
 
@@ -19,6 +21,8 @@ export type TAppStoreStates = {
   currentStores: TStore[];
   currentProducts: TProduct[];
   currentProductCategories: TProductCategory[];
+  currentEmployees: TEmployee[];
+  currentPositions: TPosition[];
   currentInventory: TInventory[];
   currentActiveOrders: TOrder[];
   currentSettings: TSettings;
@@ -34,6 +38,8 @@ export type TAppStoreActions = {
   setCurrentProductCategories: (
     currentProductCategories: TProductCategory[]
   ) => void;
+  setCurrentEmployees: (currentEmployees: TEmployee[]) => void;
+  setCurrentPositions: (currentPositions: TPosition[]) => void;
   setCurrentInventory: (currentInventory: TInventory[]) => void;
   setCurrentActiveOrders: (currentInventory: TOrder[]) => void;
   setCurrentSettings: (currentSettings: TSettings) => void;
@@ -55,6 +61,12 @@ export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
     currentProductCategories: [],
     setCurrentProductCategories: (currentProductCategories) =>
       set(() => ({ currentProductCategories })),
+    currentEmployees: [],
+    setCurrentEmployees: (currentEmployees) =>
+      set(() => ({ currentEmployees })),
+    currentPositions: [],
+    setCurrentPositions: (currentPositions) =>
+      set(() => ({ currentPositions })),
     currentInventory: [],
     setCurrentInventory: (currentInventory) =>
       set(() => ({ currentInventory })),
@@ -68,6 +80,7 @@ export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
       images: [],
       isShowingOcassion: false,
       managerEmail: "",
+      employeePositions: [],
     },
     setCurrentSettings: (currentSettings) => set(() => ({ currentSettings })),
   })

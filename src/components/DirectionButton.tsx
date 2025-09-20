@@ -18,12 +18,7 @@ export function DirectionButton({
   };
 
   return (
-    <Button
-      onClick={handleClick}
-      variant="outline"
-      size="sm"
-      className="flex items-center gap-2 w-full"
-    >
+    <Button onClick={handleClick} className="flex items-center gap-2 w-full">
       <MapPin className="w-4 h-4" />
       {label ?? "Get Directions"}
     </Button>

@@ -42,7 +42,6 @@ type OrderStatusFormProps = {
   orderData: TOrder;
 };
 function OrderStatusForm({ orderData }: OrderStatusFormProps) {
-  console.log({ orderData });
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<OrderStatusFormValues>({
     resolver: zodResolver(orderStatusSchema),

@@ -19,6 +19,7 @@ import {
   TUser,
   TOrder,
   TSettings,
+  TEmployee,
 } from "@/typings";
 import { useAppStore } from "@/lib/store";
 import CompanyLogo from "./CompanyLogo";
@@ -36,6 +37,7 @@ function Header() {
     setCurrentInventory,
     setCurrentActiveOrders,
     setCurrentSettings,
+    setCurrentEmployees,
   } = useAppStore();
   const pathname = usePathname();
   const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS!;
@@ -137,6 +139,15 @@ function Header() {
     if (res.data) {
       const activeOrders = res.data as TOrder[];
       setCurrentActiveOrders(activeOrders);
+    }
+
+    const resEmployees = await dbFetchCollection(DB_COLLECTION.EMPLOYEES);
+    if (resEmployees.status === DB_METHOD_STATUS.ERROR) {
+      console.log(resEmployees.message);
+      return;
+    }
+    if (resEmployees.data) {
+      setCurrentEmployees((resEmployees.data as TEmployee[]) || []);
     }
   };
 

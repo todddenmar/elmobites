@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -19,6 +20,7 @@ import {
 import { MoreVertical } from "lucide-react";
 import OrderStatusForm from "./forms/OrderStatusForm";
 import ViewOrderDialog from "./ViewOrderDialog";
+import Link from "next/link";
 
 type AdminOrdersActionButtonProps = {
   orderData: TOrder;
@@ -38,6 +40,16 @@ function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Order #{orderData.orderNumber}</DropdownMenuLabel>
+          <Link href={"/admin/orders/" + orderData.id}>
+            <DropdownMenuItem
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              View Order
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuItem
             onClick={() => {
               setIsOpenStatus(true);

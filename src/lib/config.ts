@@ -44,6 +44,8 @@ export const DB_COLLECTION = {
   STORES: "stores",
   PRODUCTS: "products",
   RECEIPTS: "receipts",
+  EMPLOYEES: "employees",
+  POSITIONS: "positions",
   PRODUCT_CATEGORIES: "product_categories",
   INVENTORY: "inventory",
   ORDERS: "orders",

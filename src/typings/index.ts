@@ -142,6 +142,7 @@ export type TSettings = {
   images?: TMediaFile[] | null;
   isShowingOcassion: boolean;
   managerEmail: string;
+  employeePositions: TPosition[];
 };
 export type TPaymentDetails = {
   id: string;
@@ -161,62 +162,64 @@ export type TOrderStatus =
   | "COMPLETED" // picked up / delivered successfully
   | "CANCELLED"; // cancelled by store or customer
 
-  export type TOrderPaymentStatus = "PAID" | "UNPAID" | "REFUNDED";
+export type TOrderPaymentStatus = "PAID" | "UNPAID" | "REFUNDED";
 
-  export type TOrderItem = {
-    id: string; // unique item id in this order
-    productID: string; // reference to TProduct
-    variantID?: string | null; // reference to TProductVariant if applicable
-    productName: string;
-    variantName?: string | null;
-    quantity: number;
-    price: number; // unit price
-    subtotal: number; // price * quantity
-    branchID?: string | null;
-  };
+export type TOrderItem = {
+  id: string; // unique item id in this order
+  productID: string; // reference to TProduct
+  variantID?: string | null; // reference to TProductVariant if applicable
+  productName: string;
+  variantName?: string | null;
+  quantity: number;
+  price: number; // unit price
+  subtotal: number; // price * quantity
+  branchID?: string | null;
+};
 
-  export type TOrder = {
-    id: string;
-    orderNumber: number;
-    emailAddress: string; // reference to TUser (customer)
-    branchID: string; // reference to TStore
-    items: TOrderItem[]; // list of products in the order
-    totalAmount: number; // sum of all subtotals
-    paymentMethod: TPaymentMethod; // "CASH", "E-WALLET", "BANK_TRANSFER"
-    paymentDetailsID?: string | null; // reference to TPaymentDetails if used
-    receiptImage?: TImageReceipt | null; // uploaded proof of payment
-    status: TOrderStatus;
-    createdAt: string; // ISO date
-    updatedAt: string;
-    orderType: "PICKUP" | "DELIVERY"; // 👈 new field
-    timestamp: FieldValue | string; // Firestore serverTimestamp
-    coordinates?: {
-      latitude: number;
-      longitude: number;
-    } | null;
-    locationDetails: string;
-    customer: TCustomerDetails;
-    payment: {
-      option: TPaymentDetails;
-      referenceNumber: string | null;
-      receiptImage: TImageReceipt | null;
-    };
-    occasion: string | null;
-    isFulfilled?: boolean;
-    paymentStatus: TOrderPaymentStatus;
-    logs?: TOrderLog[]; // ✅ keep history of changes
-    deliveryFee: number;
+export type TOrder = {
+  id: string;
+  orderNumber: number;
+  emailAddress: string; // reference to TUser (customer)
+  branchID: string; // reference to TStore
+  items: TOrderItem[]; // list of products in the order
+  totalAmount: number; // sum of all subtotals
+  paymentMethod: TPaymentMethod; // "CASH", "E-WALLET", "BANK_TRANSFER"
+  paymentDetailsID?: string | null; // reference to TPaymentDetails if used
+  receiptImage?: TImageReceipt | null; // uploaded proof of payment
+  status: TOrderStatus;
+  createdAt: string; // ISO date
+  updatedAt: string;
+  orderType: "PICKUP" | "DELIVERY"; // 👈 new field
+  timestamp: FieldValue | string; // Firestore serverTimestamp
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  } | null;
+  locationDetails: string;
+  customer: TCustomerDetails;
+  payment: {
+    option: TPaymentDetails;
+    referenceNumber: string | null;
+    receiptImage: TImageReceipt | null;
   };
-  export type TOrderLog = {
-    status: TOrderStatus;
-    changedAt: string; // ISO timestamp
-    changedBy?: string; // optional, if you track which admin updated it
-  };
-  export type TOrderTableItem = TOrder & {
-    customerName: string;
-    storeName: string;
-    referenceNumber: string;
-  };
+  occasion: string | null;
+  isFulfilled?: boolean;
+  paymentStatus: TOrderPaymentStatus;
+  logs?: TOrderLog[]; // ✅ keep history of changes
+  deliveryFee: number;
+  assignedEmployeeName?: string | null;
+  assignedEmployeeID?: string | null;
+};
+export type TOrderLog = {
+  status: TOrderStatus;
+  changedAt: string; // ISO timestamp
+  changedBy?: string; // optional, if you track which admin updated it
+};
+export type TOrderTableItem = TOrder & {
+  customerName: string;
+  storeName: string;
+  referenceNumber: string;
+};
 
 export type TCustomerDetails = {
   firstName: string;
@@ -250,4 +253,36 @@ export type TCart = {
   total: number; // final total (subtotal - discounts + deliveryFee)
   createdAt: string;
   updatedAt: string;
+};
+export type TPosition = {
+  id: string; // unique ID
+  name: string; // e.g. "Trainer", "Cashier", "Manager"
+  description?: string;
+  baseSalary?: number; // optional default salary for this position
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+};
+export type TSalaryType = "FIXED" | "HOURLY" | "COMMISSION";
+export type TEmploymentStatus = "ACTIVE" | "INACTIVE" | "TERMINATED";
+export type TEmployee = {
+  id: string; // unique ID
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  positionID: string;
+  employmentStatus: TEmploymentStatus;
+  hireDate: string; // ISO date
+  terminationDate?: string; // optional
+  salaryType: TSalaryType;
+  salaryAmount: number; // base rate (per month, hour, etc.)
+  commissionRate?: number; // if salaryType = COMMISSION
+
+  branchID?: string; // which branch the employee belongs to
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
+};
+
+export type TEmployeeTableItem = TEmployee & {
+  position?: TPosition;
 };

@@ -1,18 +1,16 @@
 "use client";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { dbFetchDocument } from "@/lib/firebase/actions";
-import { TOrder, TOrderPaymentStatus } from "@/typings";
+import { TEmployee, TOrder, TOrderPaymentStatus } from "@/typings";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { convertCurrency } from "@/lib/utils";
+import { cn, convertCurrency } from "@/lib/utils";
 import ErrorCard from "@/components/custom-ui/ErrorCard";
 import { useAppStore } from "@/lib/store";
 import { ArrowLeftIcon, MailIcon, UserIcon } from "lucide-react";
-import { TypographyH4 } from "@/components/custom-ui/typography";
 import dynamic from "next/dynamic";
 import { DirectionButton } from "@/components/DirectionButton";
 // dynamically import map
@@ -25,6 +23,9 @@ function AdminOrderPage() {
   const orderID = params.id as string;
   const { currentSettings } = useAppStore();
   const [order, setOrder] = useState<TOrder | null>(null);
+  const [assignedEmployee, setAssignedEmployee] = useState<TEmployee | null>(
+    null
+  );
   useEffect(() => {
     const fetchOrder = async () => {
       const res = await dbFetchDocument(DB_COLLECTION.ORDERS, orderID);
@@ -33,11 +34,24 @@ function AdminOrderPage() {
         return;
       }
       if (res.data) {
-        setOrder(res.data as TOrder);
+        const orderData = (res.data as TOrder) || null;
+        setOrder(orderData);
+        if (orderData.assignedEmployeeID) {
+          getEmployeeData(orderData.assignedEmployeeID);
+        }
       }
     };
     fetchOrder();
   }, [orderID]);
+
+  const getEmployeeData = async (id: string) => {
+    const res = await dbFetchDocument(DB_COLLECTION.EMPLOYEES, id);
+    if (res.status === DB_METHOD_STATUS.ERROR) {
+      console.log(res.message);
+      return;
+    }
+    setAssignedEmployee((res.data as TEmployee) || null);
+  };
 
   const renderPaymentStatus = () => {
     const paymentStatus = order?.paymentStatus as TOrderPaymentStatus;
@@ -115,7 +129,12 @@ function AdminOrderPage() {
                 ))}
               </CardContent>
             </Card>
-            <div className="grid lg:grid-cols-2 gap-4">
+            <div
+              className={cn(
+                "grid gap-4",
+                assignedEmployee ? "lg:grid-cols-2" : ""
+              )}
+            >
               {/* Summary */}
               <Card>
                 <CardHeader>
@@ -147,29 +166,37 @@ function AdminOrderPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Delivery</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 text-sm">
-                  <div className="flex gap-2 items-center">
-                    <div className="rounded-lg w-[50px] aspect-square bg-muted flex flex-col items-center justify-center">
-                      <UserIcon className="text-muted-foreground" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-semibold">Rider name</div>
-                      <div className="text-sm text-muted-foreground">
-                        Rider number
+              {assignedEmployee ? (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Delivery</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-sm">
+                    <div className="flex gap-2 items-center">
+                      <div className="rounded-lg w-[50px] aspect-square bg-muted flex flex-col items-center justify-center">
+                        <UserIcon className="text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold">
+                          {`${assignedEmployee.firstName} ${assignedEmployee.lastName}`}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {
+                            currentSettings.employeePositions.find(
+                              (item) => item.id === assignedEmployee.positionID
+                            )?.name
+                          }
+                        </div>
+                      </div>
+                      <div>
+                        {convertCurrency(
+                          order.deliveryFee || currentSettings.deliveryFee
+                        )}
                       </div>
                     </div>
-                    <div>
-                      {convertCurrency(
-                        order.deliveryFee || currentSettings.deliveryFee
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              ) : null}
             </div>
 
             {/* Status */}
@@ -221,11 +248,11 @@ function AdminOrderPage() {
                     {order.customer.email}
                   </div>
                   <div className="py-4 space-y-4">
-                    <TypographyH4>Location</TypographyH4>
+                    <div className="font-semibold">Location</div>
                     <div>{order.locationDetails}</div>
                     {order.orderType === "DELIVERY" && order.coordinates && (
                       <div className="space-y-4">
-                        <div className="h-64 w-full rounded-lg overflow-hidden">
+                        <div className="flex-1 w-full rounded-lg overflow-hidden">
                           <MapWithMarker
                             position={[
                               order.coordinates.latitude,
