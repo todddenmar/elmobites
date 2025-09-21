@@ -202,6 +202,7 @@ function CheckoutPage() {
       price: item.price,
       subtotal: item.price * item.quantity,
       branchID: item.branchID,
+      inventoryID: item.inventoryID,
     }));
 
     // build order

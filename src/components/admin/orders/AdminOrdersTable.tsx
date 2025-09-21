@@ -38,6 +38,7 @@ import AdminOrdersActionButton from "./AdminOrdersActionButton";
 import ViewReceiptDialog from "./ViewReceiptDialog";
 import Link from "next/link";
 import { AssignOrderToEmployee } from "./forms/AssignOrderToEmployee";
+import { OrderStatusBadge } from "@/components/custom-ui/GlobalComponents";
 
 type AdminOrdersTableProps = {
   orders: TOrderTableItem[];
@@ -110,48 +111,7 @@ export function AdminOrdersTable({ orders }: AdminOrdersTableProps) {
       },
       cell: ({ row }) => {
         const status = row.getValue("status") as TOrderTableItem["status"];
-
-        const statusConfig: Record<
-          TOrderTableItem["status"],
-          { label: string; className: string }
-        > = {
-          PENDING: {
-            label: "Pending",
-            className: "bg-gray-500 text-white",
-          },
-          CONFIRMED: {
-            label: "Confirmed",
-            className: "bg-blue-500 text-white",
-          },
-          PREPARING: {
-            label: "Preparing",
-            className: "bg-yellow-500 text-white",
-          },
-          READY_FOR_PICKUP: {
-            label: "Ready for Pickup",
-            className: "bg-indigo-500 text-white",
-          },
-          OUT_FOR_DELIVERY: {
-            label: "Out for Delivery",
-            className: "bg-purple-500 text-white",
-          },
-          COMPLETED: {
-            label: "Completed",
-            className: "bg-green-600 text-white",
-          },
-          CANCELLED: {
-            label: "Cancelled",
-            className: "bg-red-600 text-white",
-          },
-        };
-
-        const { label, className } = statusConfig[status];
-
-        return (
-          <div className="px-3">
-            <Badge className={className}>{label}</Badge>
-          </div>
-        );
+        return <div className="px-3">{OrderStatusBadge(status)}</div>;
       },
     },
     {

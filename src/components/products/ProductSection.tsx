@@ -123,6 +123,10 @@ function ProductSection({ product, category }: ProductSectionProps) {
       );
     } else {
       // item doesn't exist -> add new one
+      if (!selectedInventory) {
+        console.log({ selectedInventory });
+        return;
+      }
       const newCartItem: TCartItem = {
         id: crypto.randomUUID(),
         productID: product.id,
@@ -133,6 +137,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
         quantity,
         price: selectedVariant.price,
         stockAvailable: maxStock,
+        inventoryID: selectedInventory?.id,
       };
 
       updatedItems = customerCart?.items

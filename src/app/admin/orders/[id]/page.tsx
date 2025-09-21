@@ -2,17 +2,18 @@
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { dbFetchDocument } from "@/lib/firebase/actions";
 import { TEmployee, TOrder, TOrderPaymentStatus } from "@/typings";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Link from "next/link";
 import { cn, convertCurrency } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import { ArrowLeftIcon, MailIcon, UserIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { DirectionButton } from "@/components/DirectionButton";
 import LoadingCard from "@/components/custom-ui/LoadingCard";
+import { Button } from "@/components/ui/button";
+import AdminOrderButtons from "@/components/admin/orders/AdminOrderButtons";
 // dynamically import map
 const MapWithMarker = dynamic(
   () => import("@/components/custom-ui/MapWithMarker"),
@@ -21,6 +22,7 @@ const MapWithMarker = dynamic(
 function AdminOrderPage() {
   const params = useParams();
   const orderID = params.id as string;
+  const router = useRouter();
   const { currentSettings } = useAppStore();
   const [order, setOrder] = useState<TOrder | null>(null);
   const [assignedEmployee, setAssignedEmployee] = useState<TEmployee | null>(
@@ -79,10 +81,15 @@ function AdminOrderPage() {
     <div className="flex flex-col gap-4 flex-1 h-full p-4 rounded-lg">
       <div className="container mx-auto p-4 space-y-4">
         {/* Header */}
-        <div className="flex justify-start">
-          <Link href={"/admin/orders"} className="w-fit">
+        <div className="flex justify-between gap-4">
+          <Button
+            type="button"
+            className="cursor-pointer"
+            onClick={() => router.back()}
+          >
             <ArrowLeftIcon />
-          </Link>
+          </Button>
+          <AdminOrderButtons orderData={order} />
         </div>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
@@ -160,7 +167,7 @@ function AdminOrderPage() {
                       </span>
                     </div>
                   ) : null}
-                  <div className="flex justify-between font-semibold pt-2 border-t">
+                  <div className="flex justify-between pt-2 border-t text-base">
                     <span>Total</span>
                     <span>{convertCurrency(order.totalAmount)}</span>
                   </div>

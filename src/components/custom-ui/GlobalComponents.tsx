@@ -1,4 +1,4 @@
-import { TAdminLink } from "@/typings";
+import { TAdminLink, TOrderStatus, TOrderTableItem } from "@/typings";
 import {
   CakeIcon,
   ClipboardListIcon,
@@ -9,6 +9,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import React from "react";
+import { Badge } from "../ui/badge";
 const iconSize = 18;
 
 export const adminLinks: TAdminLink[] = [
@@ -56,3 +57,43 @@ export const adminLinks: TAdminLink[] = [
     icon: <CogIcon size={iconSize} />,
   },
 ];
+
+export const OrderStatusBadge = (status: TOrderStatus) => {
+  const statusConfig: Record<
+    TOrderTableItem["status"],
+    { label: string; className: string }
+  > = {
+    PENDING: {
+      label: "Pending",
+      className: "bg-gray-500 text-white",
+    },
+    CONFIRMED: {
+      label: "Confirmed",
+      className: "bg-blue-500 text-white",
+    },
+    PREPARING: {
+      label: "Preparing",
+      className: "bg-yellow-500 text-white",
+    },
+    READY_FOR_PICKUP: {
+      label: "Ready for Pickup",
+      className: "bg-indigo-500 text-white",
+    },
+    OUT_FOR_DELIVERY: {
+      label: "Out for Delivery",
+      className: "bg-purple-500 text-white",
+    },
+    COMPLETED: {
+      label: "Completed",
+      className: "bg-green-600 text-white",
+    },
+    CANCELLED: {
+      label: "Cancelled",
+      className: "bg-red-600 text-white",
+    },
+  };
+
+  const { label, className } = statusConfig[status];
+
+  return <Badge className={className}>{label}</Badge>;
+};

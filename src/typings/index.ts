@@ -174,6 +174,7 @@ export type TOrderItem = {
   price: number; // unit price
   subtotal: number; // price * quantity
   branchID?: string | null;
+  inventoryID: string;
 };
 
 export type TOrder = {
@@ -241,6 +242,7 @@ export type TCartItem = {
   imageURL?: string | null; // snapshot of product image
   stockAvailable?: number; // optional check against inventory
   notes?: string; // e.g. "Happy Birthday on top" for cakes
+  inventoryID: string;
 };
 
 export type TCart = {

@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/dialog";
 import { MoreVertical } from "lucide-react";
 import OrderStatusForm from "./forms/OrderStatusForm";
-import ViewOrderDialog from "./ViewOrderDialog";
 import Link from "next/link";
+import CancelOrderForm from "./forms/CancelOrderForm";
 
 type AdminOrdersActionButtonProps = {
   orderData: TOrder;
@@ -29,7 +29,7 @@ type AdminOrdersActionButtonProps = {
 function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
   const [open, setOpen] = useState(false);
   const [isOpenStatus, setIsOpenStatus] = useState(false);
-  const [isOpenOrder, setIsOpenOrder] = useState(false);
+  const [isOpenCancel, setIsOpenCancel] = useState(false);
 
   return (
     <>
@@ -60,11 +60,11 @@ function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
-              setIsOpenOrder(true);
+              setIsOpenCancel(true);
               setOpen(false);
             }}
           >
-            Order Details
+            Cancel Order
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -80,13 +80,19 @@ function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
           <OrderStatusForm orderData={orderData} />
         </DialogContent>
       </Dialog>
-      <Dialog open={isOpenOrder} onOpenChange={setIsOpenOrder}>
+      <Dialog open={isOpenCancel} onOpenChange={setIsOpenCancel}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Order #{orderData.orderNumber}</DialogTitle>
-            <DialogDescription>Order details</DialogDescription>
+            <DialogTitle>Cancel Order #{orderData.orderNumber}</DialogTitle>
+            <DialogDescription>
+              Adjust quantities to restock. Leave 0 if you don&apos;t want to
+              restock that item.
+            </DialogDescription>
           </DialogHeader>
-          <ViewOrderDialog order={orderData} />
+          <CancelOrderForm
+            orderData={orderData}
+            setClose={() => setIsOpenCancel(false)}
+          />
         </DialogContent>
       </Dialog>
     </>

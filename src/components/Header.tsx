@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import GoogleLoginButton from "./GoogleLoginButton";
 import Link from "next/link";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "@/firebase";
+import { auth, db } from "@/firebase";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import {
   dbFetchCollection,
@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import AdminMobileMenu from "./admin/AdminMobileMenu";
 import CartButton from "./products/cart/CartButton";
+import { collection, onSnapshot, query } from "firebase/firestore";
 
 function Header() {
   const {
@@ -110,18 +111,20 @@ function Header() {
       }
     };
     fetchProductCategories();
-    const fetchProductInventory = async () => {
-      const res = await dbFetchCollection(DB_COLLECTION.INVENTORY);
-      if (res.status === DB_METHOD_STATUS.ERROR) {
-        console.log(res.message);
-        return;
-      }
-      if (res.data) {
-        const Inventory = res.data as TInventory[];
-        setCurrentInventory(Inventory);
-      }
-    };
-    fetchProductInventory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const ref = collection(db, DB_COLLECTION.INVENTORY);
+    const q = query(ref);
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const inventory: TInventory[] = [];
+      querySnapshot.forEach((doc) => {
+        inventory.push(doc.data() as TInventory);
+      });
+      setCurrentInventory(inventory);
+    });
+    return () => unsubscribe(); // Cleanup on unmount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
