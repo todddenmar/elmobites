@@ -58,14 +58,16 @@ function AdminOrdersActionButton({ orderData }: AdminOrdersActionButtonProps) {
           >
             Update Status
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              setIsOpenCancel(true);
-              setOpen(false);
-            }}
-          >
-            Cancel Order
-          </DropdownMenuItem>
+          {["CANCELLED", "COMPLETED"].includes(orderData.status) ? null : (
+            <DropdownMenuItem
+              onClick={() => {
+                setIsOpenCancel(true);
+                setOpen(false);
+              }}
+            >
+              Cancel Order
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
