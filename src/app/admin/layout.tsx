@@ -1,9 +1,8 @@
 "use client";
 import AdminSidebar from "@/components/admin/AdminSidebar";
-import LoadingComponent from "@/components/custom-ui/LoadingComponent";
 import { useAppStore } from "@/lib/store";
 import React, { useEffect, useState } from "react";
-import ErrorCard from "@/components/custom-ui/ErrorCard"; // ✅ make sure this is imported
+import LoadingCard from "@/components/custom-ui/LoadingCard";
 
 function AdminRootLayout({
   children,
@@ -29,20 +28,12 @@ function AdminRootLayout({
     }
   }, [userData]);
 
-  if (status === "loading") {
+  if (status === "unauthorized" || status === "loading") {
     return (
-      <div className="flex flex-col items-center justify-center h-[600px] w-full">
-        <LoadingComponent />
-      </div>
-    );
-  }
-
-  if (status === "unauthorized") {
-    return (
-      <ErrorCard
-        title="Unauthorized"
-        description="You have no access."
-        linkText="Go Back"
+      <LoadingCard
+        title="Loading..."
+        description="Trying to access the admin page."
+        linkText="Go back to homepage"
         redirectionLink="/"
       />
     );

@@ -21,12 +21,11 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
-import { serverTimestamp } from "firebase/firestore";
 import { toast } from "sonner";
 import SubmitLoadingButtons from "@/components/custom-ui/SubmitLoadingButtons";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import { TEmployee, TEmploymentStatus } from "@/typings";
-import { dbSetDocument } from "@/lib/firebase/actions";
+import { dbUpdateDocument } from "@/lib/firebase/actions";
 
 // --------------------
 // Schema
@@ -36,19 +35,18 @@ const formSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email().optional(),
   mobileNumber: z.string().optional(),
-  phone: z.string().optional(),
   positionID: z.string().min(1, "Position is required"),
   employmentStatus: z.enum(["ACTIVE", "INACTIVE", "TERMINATED"]),
-  branchID: z.string().optional(), // 👈 added here
+  branchID: z.string().optional(),
 });
 
-type CreateEmployeeFormProps = {
+type UpdateEmployeeFormProps = {
   setClose: () => void;
+  employee: TEmployee;
 };
 
-function CreateEmployeeForm({ setClose }: CreateEmployeeFormProps) {
+function UpdateEmployeeForm({ setClose, employee }: UpdateEmployeeFormProps) {
   const {
-    userData,
     currentEmployees,
     setCurrentEmployees,
     currentStores,
@@ -60,46 +58,45 @@ function CreateEmployeeForm({ setClose }: CreateEmployeeFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      positionID: "",
-      email: "",
-      mobileNumber: "",
-      employmentStatus: "ACTIVE" as TEmploymentStatus,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      email: employee.email || "",
+      mobileNumber: employee.mobileNumber || "",
+      positionID: employee.positionID,
+      employmentStatus: employee.employmentStatus as TEmploymentStatus,
+      branchID: employee.branchID || "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!userData) {
-      toast.error("User not logged in");
-      return;
-    }
-
+    console.log({ values });
     setIsLoading(true);
 
-    const newEmployee: TEmployee = {
-      id: crypto.randomUUID(),
+    const updatedEmployee: TEmployee = {
+      ...employee,
       ...values,
-      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    const res = await dbSetDocument({
-      collectionName: DB_COLLECTION.EMPLOYEES,
-      data: { ...newEmployee, timestamp: serverTimestamp() },
-      id: newEmployee.id,
+    const res = await dbUpdateDocument(DB_COLLECTION.EMPLOYEES, employee.id, {
+      ...updatedEmployee,
     });
 
     if (res.status === DB_METHOD_STATUS.ERROR) {
-      toast.error("Error creating Employee");
+      toast.error("Error updating Employee");
       setIsLoading(false);
       return;
     }
 
-    setCurrentEmployees([...(currentEmployees || []), newEmployee]);
+    // update Zustand state
+    const updatedList = (currentEmployees || []).map((emp) =>
+      emp.id === employee.id ? updatedEmployee : emp
+    );
+    setCurrentEmployees(updatedList);
+
     setIsLoading(false);
     setClose();
-    toast.success("Employee created successfully");
+    toast.success("Employee updated successfully");
   }
 
   // --------------------
@@ -137,6 +134,7 @@ function CreateEmployeeForm({ setClose }: CreateEmployeeFormProps) {
               </FormItem>
             )}
           />
+
           {/* First Name */}
           <FormField
             control={form.control}
@@ -260,4 +258,4 @@ function CreateEmployeeForm({ setClose }: CreateEmployeeFormProps) {
   );
 }
 
-export default CreateEmployeeForm;
+export default UpdateEmployeeForm;

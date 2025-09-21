@@ -31,8 +31,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { convertCurrency, formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { TEmployeeTableItem, TPosition } from "@/typings";
+import AdminEmployeeActionButton from "./AdminEmployeeActionButton";
 
 type AdminEmployeeTableProps = {
   employees: TEmployeeTableItem[];
@@ -92,25 +93,39 @@ export function AdminEmployeeTable({ employees }: AdminEmployeeTableProps) {
       },
     },
     {
-      accessorKey: "salaryAmount",
+      accessorKey: "mobileNumber",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Salary Amount
+            Mobile Number
             <ArrowUpDown />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="px-3 capitalize">
-          {convertCurrency(row.getValue("salaryAmount"))}
-        </div>
+        <div className="px-3 capitalize">{row.getValue("mobileNumber")}</div>
       ),
     },
-
+    {
+      accessorKey: "email",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Email
+            <ArrowUpDown />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="px-3 capitalize">{row.getValue("email")}</div>
+      ),
+    },
     {
       accessorKey: "createdAt",
       header: ({ column }) => {
@@ -135,8 +150,7 @@ export function AdminEmployeeTable({ employees }: AdminEmployeeTableProps) {
       enableHiding: false,
       cell: ({ row }) => {
         const employeeData = row.original;
-        console.log({ employeeData });
-        return null;
+        return <AdminEmployeeActionButton employeeData={employeeData} />;
       },
     },
   ];

@@ -53,7 +53,8 @@ function ProductCard({
                 >
                   {idx === 0 ? null : "/"}
                   <span>
-                    {`${convertCurrency(variant.price)} ${variant.name}`}
+                    {`${convertCurrency(variant.price)}`}{" "}
+                    <span className="text-sm">{`${variant.name}`}</span>
                   </span>
                 </div>
               );

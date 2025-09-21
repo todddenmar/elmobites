@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { cn, convertCurrency } from "@/lib/utils";
-import ErrorCard from "@/components/custom-ui/ErrorCard";
 import { useAppStore } from "@/lib/store";
 import { ArrowLeftIcon, MailIcon, UserIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { DirectionButton } from "@/components/DirectionButton";
+import LoadingCard from "@/components/custom-ui/LoadingCard";
 // dynamically import map
 const MapWithMarker = dynamic(
   () => import("@/components/custom-ui/MapWithMarker"),
@@ -67,9 +67,9 @@ function AdminOrderPage() {
 
   if (!order)
     return (
-      <ErrorCard
-        title="No order found!"
-        description="The order you are trying to view is not available"
+      <LoadingCard
+        title="Loading..."
+        description="Order not found?"
         linkText="Go Back"
         redirectionLink="/admin/orders"
       />
@@ -169,7 +169,13 @@ function AdminOrderPage() {
               {assignedEmployee ? (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Delivery</CardTitle>
+                    <CardTitle>
+                      {
+                        currentSettings.employeePositions.find(
+                          (item) => item.id === assignedEmployee.positionID
+                        )?.name
+                      }
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4 text-sm">
                     <div className="flex gap-2 items-center">
@@ -181,11 +187,7 @@ function AdminOrderPage() {
                           {`${assignedEmployee.firstName} ${assignedEmployee.lastName}`}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {
-                            currentSettings.employeePositions.find(
-                              (item) => item.id === assignedEmployee.positionID
-                            )?.name
-                          }
+                          {assignedEmployee.mobileNumber}
                         </div>
                       </div>
                       <div>

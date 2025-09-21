@@ -269,15 +269,9 @@ export type TEmployee = {
   firstName: string;
   lastName: string;
   email?: string;
-  phone?: string;
+  mobileNumber?: string;
   positionID: string;
   employmentStatus: TEmploymentStatus;
-  hireDate: string; // ISO date
-  terminationDate?: string; // optional
-  salaryType: TSalaryType;
-  salaryAmount: number; // base rate (per month, hour, etc.)
-  commissionRate?: number; // if salaryType = COMMISSION
-
   branchID?: string; // which branch the employee belongs to
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
