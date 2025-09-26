@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ErrorCard from "@/components/custom-ui/ErrorCard";
 import ProductSection from "@/components/products/ProductSection";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
 import {
-  dbFetchCollection,
   dbFetchCollectionWhere,
+  dbFetchDocument,
 } from "@/lib/firebase/actions";
 import { TProduct, TProductCategory } from "@/typings";
 import { useParams } from "next/navigation";
+import LoadingCard from "@/components/custom-ui/LoadingCard";
 
 const ProductPage = () => {
   const params = useParams();
@@ -37,19 +37,21 @@ const ProductPage = () => {
           timestamp: productData.timestamp.toString(),
         };
       }
-
-      const resCategory = await dbFetchCollection(
-        DB_COLLECTION.PRODUCT_CATEGORIES
-      );
-      if (
-        resCategory.status === DB_METHOD_STATUS.SUCCESS &&
-        resCategory.data?.[0]
-      ) {
-        category = resCategory.data[0] as TProductCategory;
+      if (product?.categoryID) {
+        const resCategory = await dbFetchDocument(
+          DB_COLLECTION.PRODUCT_CATEGORIES,
+          product.categoryID
+        );
+        if (
+          resCategory.status === DB_METHOD_STATUS.SUCCESS &&
+          resCategory.data
+        ) {
+          category = resCategory.data as TProductCategory;
+          setCategory(category);
+        }
       }
 
       setProduct(product);
-      setCategory(category);
       setLoading(false);
     };
 
@@ -61,14 +63,21 @@ const ProductPage = () => {
   }, [productSlug]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <LoadingCard
+        title="Loading product"
+        description="You are trying to view a product page."
+        linkText="Go back to the products page"
+        redirectionLink="/products"
+      />
+    );
   }
 
   if (!product) {
     return (
-      <ErrorCard
-        title="Product not found"
-        description="The Product you are trying to view does not exist."
+      <LoadingCard
+        title="Looking for the product"
+        description="You are trying to view a product page."
         linkText="Go back to the products page"
         redirectionLink="/products"
       />
