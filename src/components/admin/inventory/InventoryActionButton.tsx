@@ -30,6 +30,7 @@ type InventoryActionButtonProps = {
 
 function InventoryActionButton({ inventoryData }: InventoryActionButtonProps) {
   const { currentInventory, setCurrentInventory } = useAppStore();
+  const [isOpen, setIsOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -64,19 +65,27 @@ function InventoryActionButton({ inventoryData }: InventoryActionButtonProps) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setOpenEdit(true)}>
+          <DropdownMenuItem
+            onClick={() => {
+              setIsOpen(false);
+              setOpenEdit(true);
+            }}
+          >
             Edit Product
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-red-600 focus:text-red-600"
-            onClick={() => setOpenDelete(true)}
+            onClick={() => {
+              setIsOpen(false);
+              setOpenDelete(true);
+            }}
           >
             Delete Product
           </DropdownMenuItem>

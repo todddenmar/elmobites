@@ -24,18 +24,24 @@ type StoreActionButtonProps = {
 };
 
 function StoreActionButton({ storeData }: StoreActionButtonProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setOpen(true)}>
+          <DropdownMenuItem
+            onClick={() => {
+              setIsOpen(false);
+              setOpen(true);
+            }}
+          >
             Edit Store
           </DropdownMenuItem>
         </DropdownMenuContent>
