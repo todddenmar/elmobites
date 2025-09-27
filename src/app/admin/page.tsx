@@ -1,7 +1,16 @@
 "use client";
 import { CompletedOrdersTable } from "@/components/admin/dashboard/CompletedOrdersTable";
+import { Top5ProductsChart } from "@/components/admin/dashboard/Top5ProductsChart";
 import RecentOrderItem from "@/components/admin/orders/RecentOrderItem";
-import { TypographyH4 } from "@/components/custom-ui/typography";
+import EmptyLayout from "@/components/custom-ui/EmptyLayout";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { db } from "@/firebase";
 import { DB_COLLECTION, DB_METHOD_STATUS } from "@/lib/config";
@@ -101,58 +110,80 @@ function AdminPage() {
   }, [currentActiveOrders]);
   return (
     <div className="flex-1 flex flex-col gap-4 h-full p-4 lg:p-0">
-      <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-4">
-        <OverviewCard
-          title="Total Sales Today"
-          icon={<PhilippinePesoIcon className="text-muted-foreground" />}
-          content={convertCurrency(salesToday)}
-        />
-        <OverviewCard
-          title="Active Orders"
-          icon={<ClipboardListIcon className="text-muted-foreground" />}
-          content={totalActive}
-        />
-        <OverviewCard
-          title="Orders Completed Today"
-          icon={<ClipboardCheckIcon className="text-muted-foreground" />}
-          content={totalCompleted}
-        />
-        <OverviewCard
-          title="Top Product Today"
-          icon={<StarIcon className="text-muted-foreground" />}
-          content={topProduct || "none"}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-3 2xl:grid-cols-4 gap-4 flex-1 h-full ">
-        <div className="flex xl:col-span-1 gap-4 flex-col bg-white p-4 rounded-lg h-full w-full">
-          <TypographyH4>Recent Orders</TypographyH4>
-          <ScrollArea className="border rounded-lg p-2 h-[500px]">
-            <div className="space-y-2">
-              {currentActiveOrders.map((item) => {
-                return (
-                  <RecentOrderItem
-                    key={`active-orders-${item.id}`}
-                    order={item}
-                  />
-                );
-              })}
-            </div>
-          </ScrollArea>
-        </div>
-        <div className="flex-1 xl:col-span-2 2xl:col-span-3 flex flex-col gap-4 bg-white p-4 rounded-lg h-full">
-          <TypographyH4>Completed Orders Today</TypographyH4>
-          <div>
-            <CompletedOrdersTable
-              orders={completedOrdersToday.map((item) => ({
-                ...item,
-                customerName: item.customer.fullName,
-                storeName:
-                  currentStores.find((s) => s.id === item.branchID)?.name || "",
-                referenceNumber: item.payment.referenceNumber || "",
-              }))}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 flex-1">
+        <div className="flex flex-col lg:col-span-2 xl:col-span-3 gap-4">
+          <div className="grid md:grid-cols-2 2xl:grid-cols-4 gap-4">
+            <OverviewCard
+              title="Total Sales Today"
+              icon={<PhilippinePesoIcon className="text-muted-foreground" />}
+              content={convertCurrency(salesToday)}
+            />
+            <OverviewCard
+              title="Active Orders"
+              icon={<ClipboardListIcon className="text-muted-foreground" />}
+              content={totalActive}
+            />
+            <OverviewCard
+              title="Orders Completed Today"
+              icon={<ClipboardCheckIcon className="text-muted-foreground" />}
+              content={totalCompleted}
+            />
+            <OverviewCard
+              title="Top Product Today"
+              icon={<StarIcon className="text-muted-foreground" />}
+              content={topProduct || "none"}
             />
           </div>
+
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Completed Orders Today</CardTitle>
+              <CardDescription>
+                All completed orders in this date
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex-1">
+                <CompletedOrdersTable
+                  orders={completedOrdersToday.map((item) => ({
+                    ...item,
+                    customerName: item.customer.fullName,
+                    storeName:
+                      currentStores.find((s) => s.id === item.branchID)?.name ||
+                      "",
+                    referenceNumber: item.payment.referenceNumber || "",
+                  }))}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="flex flex-col gap-4 lg:col-span-2 xl:col-span-1">
+          <Top5ProductsChart />
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Recent Orders</CardTitle>
+              <CardDescription>Orders by date</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {currentActiveOrders.length > 0 ? (
+                <ScrollArea className="border rounded-lg p-2">
+                  <div className="space-y-2">
+                    {currentActiveOrders.map((item) => {
+                      return (
+                        <RecentOrderItem
+                          key={`active-orders-${item.id}`}
+                          order={item}
+                        />
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              ) : (
+                <EmptyLayout>No Recent Orders</EmptyLayout>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
@@ -166,13 +197,16 @@ type OverviewCardProps = {
 };
 function OverviewCard({ title, icon, content }: OverviewCardProps) {
   return (
-    <div className="bg-white rounded-lg p-4 space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="font-semibold">{title}</div>
-        <div className="bg-muted p-2 rounded-full">{icon}</div>
-      </div>
-      <div>{content}</div>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription></CardDescription>
+        <CardAction>{icon}</CardAction>
+      </CardHeader>
+      <CardContent>
+        <div>{content}</div>
+      </CardContent>
+    </Card>
   );
 }
 
