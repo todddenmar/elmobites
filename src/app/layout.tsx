@@ -43,6 +43,11 @@ export const metadata: Metadata = {
     images: "https://thecakecopagadian.com/images/thumbnail.png",
   },
   keywords: ["Cakes", "Pagadian City", "Coffee", "Cafe"],
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/icons/icon-192x192.png",
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
