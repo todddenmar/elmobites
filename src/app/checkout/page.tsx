@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 import { TypographyH1, TypographyH4 } from "@/components/custom-ui/typography";
 import { useAppStore } from "@/lib/store";
-import { cn, convertCurrency } from "@/lib/utils";
+import { cn, convertCurrency, getDistanceInKm } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -66,13 +66,14 @@ function CheckoutPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const {
+    currentStores,
     customerCart,
     googleUser,
     setCustomerCart,
     setGoogleUser,
     currentSettings,
   } = useAppStore();
-  const DELIVERY_FEE = currentSettings.deliveryFee;
+  const [deliveryFee, setDeliveryFee] = useState<number>(0);
   const [deliveryOption, setDeliveryOption] = useState<"delivery" | "pickup">(
     "pickup"
   );
@@ -85,13 +86,48 @@ function CheckoutPage() {
   const [referenceNumber, setReferenceNumber] = useState("");
   const [occasion, setOccasion] = useState("");
   const [email, setEmail] = useState("");
+  const [distanceInKM, setDistanceInKM] = useState<number>(0);
   const [isLoadingLogin, setIsLoadingLogin] = useState(false);
+  console.log({ position, distanceInKM });
 
   useEffect(() => {
     if (deliveryOption === "delivery") {
       setPaymentOption(PAYMENT_OPTION.E_WALLET.id as TPaymentMethod);
     }
   }, [deliveryOption]);
+
+  useEffect(() => {
+    if (!position) return;
+
+    const storeData = currentStores.find(
+      (s) => s.id === customerCart?.items[0]?.branchID
+    );
+    if (!storeData) return;
+
+    const storeCoords = storeData.coordinates.split(",").map(Number) as [
+      number,
+      number
+    ];
+
+    const distance = getDistanceInKm(storeCoords, position);
+    setDistanceInKM(distance);
+
+    // Defensive numeric coercion (in case settings came as strings)
+    const minKm = Number(currentSettings.minimumDeliveryKilometer) || 0;
+    const minFee = Number(currentSettings.minimumDeliveryFee) || 0;
+    const extraKmUnit = Number(currentSettings.extraKilometer) || 1;
+    const extraKmFee = Number(currentSettings.extraKilometerFee) || 0;
+
+    let fee = minFee;
+
+    if (distance > minKm) {
+      const extraKm = distance - minKm;
+      const blocks = Math.ceil(extraKm / extraKmUnit);
+      fee += blocks * extraKmFee;
+    }
+
+    setDeliveryFee(fee);
+  }, [position, currentStores, customerCart, currentSettings]);
 
   const onLogin = () => {
     if (!firstName || !lastName) {
@@ -137,7 +173,7 @@ function CheckoutPage() {
     useState<TPaymentDetails | null>(null);
   const isDelivery = deliveryOption === "delivery";
   const total = customerCart
-    ? Number(customerCart.total) + (isDelivery ? Number(DELIVERY_FEE) : 0)
+    ? Number(customerCart.total) + (isDelivery ? Number(deliveryFee) : 0)
     : 0;
   const isInPagadianCity = (lat: number, lng: number): boolean => {
     return lat >= 7.799 && lat <= 7.883 && lng >= 123.399 && lng <= 123.525;
@@ -233,7 +269,7 @@ function CheckoutPage() {
         referenceNumber: referenceNumber || null,
         receiptImage: receiptImage || null,
       },
-      deliveryFee: currentSettings.deliveryFee || 0,
+      deliveryFee: deliveryFee || 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       timestamp: serverTimestamp(),
@@ -676,7 +712,7 @@ function CheckoutPage() {
               {isDelivery && (
                 <div className="flex justify-between text-sm">
                   <span>Delivery Fee</span>
-                  <span>{convertCurrency(DELIVERY_FEE)}</span>
+                  <span>{convertCurrency(deliveryFee)}</span>
                 </div>
               )}
               <div className="flex justify-between font-medium text-lg">

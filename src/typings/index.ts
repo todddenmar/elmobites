@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 
 export type TPaymentMethod = "E-WALLET" | "CASH" | "BANK_TRANSFER";
 
-export type TRaceGender = "male" | "female";
+export type TGender = "male" | "female";
 export type TGoogleUser = {
   uid: string;
   email: string;
@@ -136,13 +136,16 @@ export type TProductCategory = {
 };
 
 export type TSettings = {
-  deliveryFee: number;
   paymentOptions: TPaymentDetails[];
   updatedAt: string;
   images?: TMediaFile[] | null;
   isShowingOcassion: boolean;
   managerEmail: string;
   employeePositions: TPosition[];
+  minimumDeliveryKilometer: number;
+  minimumDeliveryFee: number;
+  extraKilometer: number;
+  extraKilometerFee: number;
 };
 export type TPaymentDetails = {
   id: string;

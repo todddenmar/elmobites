@@ -39,7 +39,6 @@ export default function OrderDetailPage() {
   const orderId = params?.id as string;
   const [order, setOrder] = useState<TOrder | null>(null);
   const { currentStores, currentSettings } = useAppStore();
-  const DELIVERY_FEE = currentSettings.deliveryFee;
   useEffect(() => {
     if (orderId) fetchOrderById(orderId).then(setOrder);
   }, [orderId]);
@@ -134,7 +133,11 @@ export default function OrderDetailPage() {
           {order.orderType === "DELIVERY" && (
             <div className="flex justify-between text-sm">
               <span>Delivery Fee</span>
-              <span>{convertCurrency(DELIVERY_FEE)}</span>
+              <span>
+                {order.deliveryFee
+                  ? convertCurrency(order.deliveryFee || 0)
+                  : "No Delivery Fee"}
+              </span>
             </div>
           )}
 

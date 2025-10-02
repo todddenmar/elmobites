@@ -258,7 +258,7 @@ function ProductSection({ product, category }: ProductSectionProps) {
           </p>
           {isOpen ? (
             maxStock < 1 ? null : (
-              <div className="grid gap-4 sticky bottom-0 py-4 bg-white/5 left-0 right-0 h-fit">
+              <div className="grid gap-4 sticky bottom-0 py-4 left-0 right-0 h-fit">
                 <div className="grid grid-cols-2 gap-4">
                   <Button
                     onClick={onAddToCart}

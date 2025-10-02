@@ -26,10 +26,22 @@ import { Checkbox } from "@/components/ui/checkbox";
 // Schema
 // --------------------
 const formSchema = z.object({
-  deliveryFee: z
+  minimumDeliveryKilometer: z
     .string()
-    .min(1, { message: "Delivery fee is required" })
-    .regex(/^\d+$/, { message: "Delivery fee must be a number" }),
+    .min(1, { message: "Mininum kilometer is required" })
+    .regex(/^\d+$/, { message: "Kilometer must be a number" }),
+  minimumDeliveryFee: z
+    .string()
+    .min(1, { message: "Minimum delivery fee is required" })
+    .regex(/^\d+$/, { message: "Fee must be a number" }),
+  extraKilometer: z
+    .string()
+    .min(1, { message: "Extra kilometer is required" })
+    .regex(/^\d+$/, { message: "Kilometer must be a number" }),
+  extraKilometerFee: z
+    .string()
+    .min(1, { message: "Extra kilometer delivery fee is required" })
+    .regex(/^\d+$/, { message: "Fee must be a number" }),
   isShowingOcassion: z.boolean().catch(false), // ✅ ensures it's always boolean
   managerEmail: z.string().min(2, {
     message: "Email must be at least 2 characters.",
@@ -45,7 +57,12 @@ function AdminSettingsForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      deliveryFee: currentSettings?.deliveryFee.toString() || "50",
+      minimumDeliveryKilometer:
+        currentSettings?.minimumDeliveryKilometer?.toString() || "3",
+      extraKilometer: currentSettings?.extraKilometer?.toString() || "1",
+      minimumDeliveryFee:
+        currentSettings?.minimumDeliveryFee?.toString() || "20",
+      extraKilometerFee: currentSettings?.extraKilometerFee?.toString() || "10",
       isShowingOcassion: currentSettings?.isShowingOcassion || false,
       managerEmail: currentSettings?.managerEmail || process.env.EMAIL_FROM!,
     },
@@ -87,7 +104,20 @@ function AdminSettingsForm() {
         {/* Delivery Fee */}
         <FormField
           control={form.control}
-          name="deliveryFee"
+          name="minimumDeliveryKilometer"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Minimum Kilometer</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="Enter number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="minimumDeliveryFee"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Delivery Fee</FormLabel>
@@ -97,6 +127,32 @@ function AdminSettingsForm() {
                   placeholder="Enter delivery fee"
                   {...field}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="extraKilometer"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Extra Kilometer</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="Enter number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="extraKilometerFee"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Extra Fee per kilometer</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="Enter fee" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -44,44 +44,43 @@ export type TAppStoreActions = {
   setCurrentActiveOrders: (currentInventory: TOrder[]) => void;
   setCurrentSettings: (currentSettings: TSettings) => void;
 };
-export const useAppStore = create<TAppStoreStates & TAppStoreActions>(
-  (set) => ({
-    googleUser: null,
-    setGoogleUser: (googleUser) => set(() => ({ googleUser })),
-    userData: null,
-    setUserData: (userData) => set(() => ({ userData })),
-    isOpenCart: false,
-    setIsOpenCart: (isOpenCart) => set(() => ({ isOpenCart })),
-    customerCart: null,
-    setCustomerCart: (customerCart) => set(() => ({ customerCart })),
-    currentStores: [],
-    setCurrentStores: (currentStores) => set(() => ({ currentStores })),
-    currentProducts: [],
-    setCurrentProducts: (currentProducts) => set(() => ({ currentProducts })),
-    currentProductCategories: [],
-    setCurrentProductCategories: (currentProductCategories) =>
-      set(() => ({ currentProductCategories })),
-    currentEmployees: [],
-    setCurrentEmployees: (currentEmployees) =>
-      set(() => ({ currentEmployees })),
-    currentPositions: [],
-    setCurrentPositions: (currentPositions) =>
-      set(() => ({ currentPositions })),
-    currentInventory: [],
-    setCurrentInventory: (currentInventory) =>
-      set(() => ({ currentInventory })),
-    currentActiveOrders: [],
-    setCurrentActiveOrders: (currentActiveOrders) =>
-      set(() => ({ currentActiveOrders })),
-    currentSettings: {
-      deliveryFee: 50,
-      paymentOptions: [],
-      updatedAt: new Date().toISOString(),
-      images: [],
-      isShowingOcassion: false,
-      managerEmail: "",
-      employeePositions: [],
-    },
-    setCurrentSettings: (currentSettings) => set(() => ({ currentSettings })),
-  })
-);
+export const useAppStore = create<TAppStoreStates & TAppStoreActions>((set) => ({
+  googleUser: null,
+  setGoogleUser: (googleUser) => set(() => ({ googleUser })),
+  userData: null,
+  setUserData: (userData) => set(() => ({ userData })),
+  isOpenCart: false,
+  setIsOpenCart: (isOpenCart) => set(() => ({ isOpenCart })),
+  customerCart: null,
+  setCustomerCart: (customerCart) => set(() => ({ customerCart })),
+  currentStores: [],
+  setCurrentStores: (currentStores) => set(() => ({ currentStores })),
+  currentProducts: [],
+  setCurrentProducts: (currentProducts) => set(() => ({ currentProducts })),
+  currentProductCategories: [],
+  setCurrentProductCategories: (currentProductCategories) =>
+    set(() => ({ currentProductCategories })),
+  currentEmployees: [],
+  setCurrentEmployees: (currentEmployees) => set(() => ({ currentEmployees })),
+  currentPositions: [],
+  setCurrentPositions: (currentPositions) => set(() => ({ currentPositions })),
+  currentInventory: [],
+  setCurrentInventory: (currentInventory) => set(() => ({ currentInventory })),
+  currentActiveOrders: [],
+  setCurrentActiveOrders: (currentActiveOrders) =>
+    set(() => ({ currentActiveOrders })),
+  currentSettings: {
+    deliveryFee: 50,
+    paymentOptions: [],
+    updatedAt: new Date().toISOString(),
+    images: [],
+    isShowingOcassion: false,
+    managerEmail: "",
+    employeePositions: [],
+    minimumDeliveryKilometer: 0,
+    minimumDeliveryFee: 0,
+    extraKilometer: 1,
+    extraKilometerFee: 0,
+  },
+  setCurrentSettings: (currentSettings) => set(() => ({ currentSettings })),
+}));

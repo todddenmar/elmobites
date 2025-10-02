@@ -32,7 +32,7 @@ function PaymentDetailsItem({
     document.body.removeChild(link);
   };
   return (
-    <div className="p-2 bg-black text-white rounded-lg items-center flex gap-2">
+    <div className="p-2 bg-white/5 text-white rounded-lg items-center flex gap-2">
       <div className="flex-1 ">
         <div className="font-semibold">{paymentDetails.paymentProvider}</div>
         <div className="text-sm">{paymentDetails.accountName}</div>

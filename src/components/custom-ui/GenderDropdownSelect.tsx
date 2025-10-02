@@ -6,11 +6,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { TRaceGender } from "@/typings";
+import { TGender } from "@/typings";
 
 type GenderDropdownSelectProps = {
   value: string | undefined;
-  onChange: (value: TRaceGender) => void;
+  onChange: (value: TGender) => void;
   withAll?: boolean;
   isFemaleOnly?: boolean;
   isMaleOnly?: boolean;

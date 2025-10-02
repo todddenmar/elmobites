@@ -163,7 +163,9 @@ function AdminOrderPage() {
                     <div className="flex justify-between">
                       <span>Delivery Fee</span>
                       <span>
-                        {convertCurrency(currentSettings.deliveryFee)}
+                        {order.deliveryFee
+                          ? convertCurrency(order.deliveryFee || 0)
+                          : "No Delivery Fee"}
                       </span>
                     </div>
                   ) : null}
@@ -198,9 +200,9 @@ function AdminOrderPage() {
                         </div>
                       </div>
                       <div>
-                        {convertCurrency(
-                          order.deliveryFee || currentSettings.deliveryFee
-                        )}
+                        {order.deliveryFee
+                          ? convertCurrency(order.deliveryFee || 0)
+                          : "No Delivery Fee"}
                       </div>
                     </div>
                   </CardContent>
