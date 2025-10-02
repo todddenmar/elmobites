@@ -67,7 +67,7 @@ function AdminSettingsPage() {
         <div className="space-y-2">
           <Label>QR Code</Label>
           <div className="border rounded-lg p-4">
-            <QrCodeViewer url={"https://www.thecakecopagadian.com/"} />
+            <QrCodeViewer url={"https://www.elmobites.com/"} />
           </div>
         </div>
       </div>

@@ -20,9 +20,9 @@ export async function POST(request: Request) {
     .join("");
 
   const message = {
-    from: `The Cake Co. <${process.env.EMAIL_FROM}>`,
+    from: `Elmo Bites <${process.env.EMAIL_FROM}>`,
     to: body.email, // usually your admin/manager email
-    subject: `🎂 New Cake Order - ${body.orderId}`,
+    subject: `🎂 New Order - ${body.orderId}`,
     html: `
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -35,11 +35,11 @@ export async function POST(request: Request) {
   <div style="background-color: #ffffff; padding: 20px; border-radius: 20px; max-width: 540px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);">
     
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="https://thecakecopagadian.com/images/logo-white-bg.png" alt="The Cake Co. logo" height="100" />
+      <img src="https://elmobites.com/images/logo-white-bg.png" alt="Elmo Bites logo" height="100" />
     </div>
 
     <p style="font-weight: bold; font-size: 24px; margin: 0 0 10px 0;">
-      🎂 New Cake Order Received!
+       New Order Received!
     </p>
     <p style="font-size: 16px; margin: 0 0 20px 0;">
       You have a new order waiting for confirmation.
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     </table>
 
     <div style="text-align: right;">
-      <a href="https://thecakecopagadian.com/admin" target="_blank" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 500;">
+      <a href="https://elmobites.com/admin" target="_blank" style="display: inline-block; background-color: #000000; color: #ffffff; text-decoration: none; padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 500;">
         View Orders
       </a>
     </div>
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
 </html>
 `,
     headers: {
-      "X-Entity-Ref-ID": "cake-order",
+      "X-Entity-Ref-ID": "product-order",
     },
   };
 

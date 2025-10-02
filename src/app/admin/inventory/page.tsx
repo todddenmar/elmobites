@@ -16,11 +16,17 @@ function AdminInventoryPage() {
     currentStores,
     currentProductCategories,
   } = useAppStore();
-  const [branch, setBranch] = useState(currentStores[0].id);
+  const [branch, setBranch] = useState<string | null>(null);
   const [filteredItems, setFilteredItems] = useState<TInventoryListItem[]>([]);
   const [filteredProductVariants, setFilteredProductVariants] = useState<
     TProductVariantItem[]
   >([]);
+
+  useEffect(() => {
+    if (currentStores[0]) {
+      setBranch(currentStores[0].id);
+    }
+  }, [currentStores]);
 
   useEffect(() => {
     const items = currentInventory;

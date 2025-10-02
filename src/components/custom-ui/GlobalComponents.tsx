@@ -1,6 +1,6 @@
 import { TAdminLink, TOrderStatus, TOrderTableItem } from "@/typings";
 import {
-  CakeIcon,
+  AppleIcon,
   ClipboardListIcon,
   CogIcon,
   FileBoxIcon,
@@ -30,7 +30,7 @@ export const adminLinks: TAdminLink[] = [
     id: "products",
     label: "Products",
     path: "/admin/products",
-    icon: <CakeIcon size={iconSize} />,
+    icon: <AppleIcon size={iconSize} />,
   },
   {
     id: "inventory",

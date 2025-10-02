@@ -64,7 +64,7 @@ const ProductsPage = () => {
     return (
       <LoadingCard
         title="Loading..."
-        description="Our cakes will be available soon."
+        description="Our products will be available soon."
         linkText="Go back to homepage"
         redirectionLink="/"
       />

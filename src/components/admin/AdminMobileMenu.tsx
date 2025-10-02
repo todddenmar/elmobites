@@ -37,9 +37,7 @@ function AdminMobileMenu() {
           <div className="flex flex-1 flex-col h-full">
             <div className="flex flex-col gap-4">
               <div className="font-main p-4 flex flex-col text-6xl items-center justify-center">
-                <div>The</div>
-                <div>Cake</div>
-                <div>Co.</div>
+                ELMO BITES
               </div>
               <ul className="flex flex-col">
                 {adminLinks.map((item) => {

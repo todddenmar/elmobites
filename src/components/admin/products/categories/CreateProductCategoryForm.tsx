@@ -152,7 +152,7 @@ function CreateProductCategoryForm({
                     <FormLabel>Tags</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="e.g. cake, cheese cake, etc."
+                        placeholder="e.g. salad, sweets, etc."
                         {...field}
                       />
                     </FormControl>

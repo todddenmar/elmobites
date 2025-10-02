@@ -9,13 +9,13 @@ import { getAuth } from "firebase/auth";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
- apiKey: "AIzaSyC6XstVXgGCdisFCkLQycpntudvyoqizpY",
-  authDomain: "the-cake-co-pagadian.firebaseapp.com",
-  projectId: "the-cake-co-pagadian",
-  storageBucket: "the-cake-co-pagadian.firebasestorage.app",
-  messagingSenderId: "451913821928",
-  appId: "1:451913821928:web:ffcacdea35096f4d82235d",
-  measurementId: "G-6ZTY0T5FXB"
+  apiKey: "AIzaSyCPZd0BPvkxy5yCN88bIcwZN0QzEGw_uKg",
+  authDomain: "elmo-bites.firebaseapp.com",
+  projectId: "elmo-bites",
+  storageBucket: "elmo-bites.firebasestorage.app",
+  messagingSenderId: "567294133897",
+  appId: "1:567294133897:web:f1556f8355e543967fe858",
+  measurementId: "G-5LEBG7HK29",
 };
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const db = getFirestore(app);

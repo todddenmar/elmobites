@@ -191,7 +191,7 @@ function GoogleLoginButton() {
           <Dialog open={isSignInOpen} onOpenChange={setIsSignInOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Welcome to The Cake Co.</DialogTitle>
+                <DialogTitle>Welcome to Elmo Bites</DialogTitle>
                 <DialogDescription>
                   Please choose how you want to sign in.
                 </DialogDescription>

@@ -41,9 +41,9 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-main: var(--font-dream); 
+  --font-main: var(--font-montserrat); 
   --font-secondary: var(--font-montserrat);
-  --font-accent: var(--font-boston);
+  --font-accent: var(--font-montserrat);
   --font-signature: var(--font-signature);
 }
 
