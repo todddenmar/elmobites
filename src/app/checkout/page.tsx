@@ -79,7 +79,6 @@ function CheckoutPage() {
   );
   const [position, setPosition] = useState<[number, number] | null>(null);
   const [locationDetails, setLocationDetails] = useState("");
-  const [isPagadian, setIsPagadian] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
@@ -175,9 +174,7 @@ function CheckoutPage() {
   const total = customerCart
     ? Number(customerCart.total) + (isDelivery ? Number(deliveryFee) : 0)
     : 0;
-  const isInPagadianCity = (lat: number, lng: number): boolean => {
-    return lat >= 7.799 && lat <= 7.883 && lng >= 123.399 && lng <= 123.525;
-  };
+
   // get browser location
   useEffect(() => {
     if (isDelivery && navigator.geolocation) {
@@ -189,13 +186,6 @@ function CheckoutPage() {
       );
     }
   }, [isDelivery]);
-
-  useEffect(() => {
-    if (position) {
-      const res = isInPagadianCity(position[0], position[1]);
-      setIsPagadian(res);
-    }
-  }, [position]);
 
   useEffect(() => {
     const paymentDetails =
@@ -369,22 +359,7 @@ function CheckoutPage() {
         </Alert>
       );
     }
-    if (!isPagadian && isDelivery) {
-      return (
-        <div className="flex flex-col gap-2">
-          <Alert variant="destructive">
-            <AlertTriangleIcon />
-            <AlertTitle>
-              Your delivery address is not within Pagadian City
-            </AlertTitle>
-          </Alert>
 
-          <Button type="button" onClick={() => setPosition([7.8257, 123.4377])}>
-            Show Pagadian in the map
-          </Button>
-        </div>
-      );
-    }
     if (!firstName || !lastName || !mobileNumber) {
       return (
         <Alert variant="destructive">
@@ -467,7 +442,7 @@ function CheckoutPage() {
             {isDelivery && (
               <div className="space-y-4 border-t pt-4">
                 <h2 className="font-semibold">
-                  Delivery Location (within Pagadian City only)
+                  Delivery Location ({distanceInKM.toFixed(2) + "km"})
                 </h2>
                 {position && (
                   <MapWithMarker

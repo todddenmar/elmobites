@@ -38,7 +38,7 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const orderId = params?.id as string;
   const [order, setOrder] = useState<TOrder | null>(null);
-  const { currentStores, currentSettings } = useAppStore();
+  const { currentStores } = useAppStore();
   useEffect(() => {
     if (orderId) fetchOrderById(orderId).then(setOrder);
   }, [orderId]);
