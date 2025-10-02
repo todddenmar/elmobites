@@ -392,7 +392,7 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="bg-neutral-100">
+    <div className="bg-neutral-100 dark:bg-neutral-950">
       <div className="p-4 space-y-4 max-w-7xl w-full mx-auto">
         <TypographyH1>Checkout</TypographyH1>
 
