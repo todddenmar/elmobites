@@ -118,7 +118,7 @@ function AdminProductPage() {
 
   if (!product) return <EmptyLayout>Product Not Found</EmptyLayout>;
   return (
-    <div className="flex flex-col gap-4 flex-1 h-full bg-white p-4 rounded-lg">
+    <div className="flex flex-col gap-4 flex-1 h-full bg-white/5 p-4 rounded-lg">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>

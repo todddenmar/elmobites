@@ -119,7 +119,7 @@ function ReceiptScreenshotUpload({
       ) : (
         <div
           {...getRootProps()}
-          className="rounded-lg bg-white/5 border h-[50px] border-dashed p-4 flex flex-col items-center justify-center w-full relative cursor-pointer hover:bg-white/5"
+          className="rounded-lg bg-white/5/5 border h-[50px] border-dashed p-4 flex flex-col items-center justify-center w-full relative cursor-pointer hover:bg-white/5/5"
         >
           <input {...getInputProps()} />
           {isDragActive ? <p>Drop the files here ...</p> : <ImagePlusIcon />}
@@ -127,7 +127,7 @@ function ReceiptScreenshotUpload({
       )}
 
       {value?.url && (
-        <ScrollArea className="h-[200px] p-4 bg-white/5">
+        <ScrollArea className="h-[200px] p-4 bg-white/5/5">
           <div className="flex-1 relative overflow-y-auto">
             <Image
               src={value?.url}

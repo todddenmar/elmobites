@@ -46,7 +46,7 @@ function SelectImageFromGallery({
                   <div
                     key={`choose-gallery-image-item-${idx}`}
                     className={cn(
-                      "rounded-lg bg-white/5 overflow-hidden h-fit cursor-pointer",
+                      "rounded-lg bg-white/5/5 overflow-hidden h-fit cursor-pointer",
                       isActive ? "border border-white" : ""
                     )}
                     onClick={() => {

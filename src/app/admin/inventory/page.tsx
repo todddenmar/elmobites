@@ -98,7 +98,7 @@ function AdminInventoryPage() {
   if (!branch) return <EmptyLayout>No Branch for Inventory</EmptyLayout>;
 
   return (
-    <div className="flex flex-col gap-4 flex-1 h-full bg-white p-4 rounded-lg">
+    <div className="flex flex-col gap-4 flex-1 h-full bg-white/5 p-4 rounded-lg">
       <div className="grid grid-cols-1 gap-4 lg:flex justify-between items-center w-full">
         <SectionTitle>Inventory</SectionTitle>
 

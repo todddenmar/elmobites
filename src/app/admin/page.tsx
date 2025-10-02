@@ -5,7 +5,6 @@ import RecentOrderItem from "@/components/admin/orders/RecentOrderItem";
 import EmptyLayout from "@/components/custom-ui/EmptyLayout";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -197,16 +196,15 @@ type OverviewCardProps = {
 };
 function OverviewCard({ title, icon, content }: OverviewCardProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription></CardDescription>
-        <CardAction>{icon}</CardAction>
-      </CardHeader>
-      <CardContent>
+    <div className="bg-white/5 border rounded-lg p-2 lg:p-4 text-sm relative">
+      <div>
+        <div>{title}</div>
+        <div className="absolute right-2 top-2 lg:right-4 lg:top-4">{icon}</div>
+      </div>
+      <div className="text-base">
         <div>{content}</div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

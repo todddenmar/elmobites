@@ -50,7 +50,7 @@ export default function SignInRedirectPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen  px-4 text-center">
-      <div className="max-w-md bg-white/5 border rounded-xl shadow p-6 space-y-4">
+      <div className="max-w-md bg-white/5/5 border rounded-xl shadow p-6 space-y-4">
         <div className="text-xl font-semibold">{_.startCase(eventSlug)}</div>
         <div className="flex items-end gap-4">
           <Image
@@ -60,7 +60,7 @@ export default function SignInRedirectPage() {
             height={200}
           />{" "}
           <div>
-            <div className="bg-white/10 rounded-3xl rounded-bl-none p-4 flex flex-col items-center justify-center">
+            <div className="bg-white/5/10 rounded-3xl rounded-bl-none p-4 flex flex-col items-center justify-center">
               <p className="text-sm">
                 Hmm... it seems you&apos;re currently in Facebook or
                 Instagram&apos;s in-app browser.

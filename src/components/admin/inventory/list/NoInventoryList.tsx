@@ -13,7 +13,7 @@ function NoInventoryList({ productVariants }: NoInventoryListProps) {
     a.productName < b.productName ? -1 : 1
   );
   return (
-    <div className="space-y-4 bg-white p-4 rounded-lg border">
+    <div className="space-y-4 bg-white/5 p-4 rounded-lg border">
       <TypographyH4>Available For Stocking</TypographyH4>
       <ScrollArea className="h-[500px] border rounded-lg">
         <div className="flex flex-col gap-2 p-2">

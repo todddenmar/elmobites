@@ -56,7 +56,7 @@ function AdminSettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 flex-1 h-full bg-white p-4 rounded-lg">
+    <div className="flex flex-col gap-4 flex-1 h-full bg-white/5 p-4 rounded-lg">
       <div className="flex justify-between items-center gap-2">
         <SectionTitle>Settings</SectionTitle>
       </div>

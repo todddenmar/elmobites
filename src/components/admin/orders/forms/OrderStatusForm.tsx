@@ -197,7 +197,7 @@ function OrderStatusForm({ orderData }: OrderStatusFormProps) {
         {/* Logs List */}
         <div className="space-y-2">
           <FormLabel>Status History</FormLabel>
-          <ul className="space-y-2 border rounded-md p-3 bg-white">
+          <ul className="space-y-2 border rounded-md p-3 bg-white/5">
             {(orderData.logs || []).map((log, i) => {
               const statusConfig: Record<
                 TOrderTableItem["status"],

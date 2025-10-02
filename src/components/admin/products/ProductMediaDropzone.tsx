@@ -45,7 +45,7 @@ function ProductMediaDropzone({
     <div
       {...getRootProps()}
       className={cn(
-        "rounded-lg p-0 flex flex-col text-lightblue items-center justify-center cursor-pointer hover:bg-white/5",
+        "rounded-lg p-0 flex flex-col text-lightblue items-center justify-center cursor-pointer hover:bg-white/5/5",
         isDisabled ? "opacity-50 cursor-not-allowed" : "",
         uploadedCount === 0 ? "w-full h-[36px]" : "w-[50px] h-full"
       )}

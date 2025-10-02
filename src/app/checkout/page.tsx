@@ -397,7 +397,7 @@ function CheckoutPage() {
         <TypographyH1>Checkout</TypographyH1>
 
         <div className="flex flex-col lg:flex-row gap-4">
-          <div className="w-full flex-1 space-y-4 border rounded-lg p-4 h-fit bg-white">
+          <div className="w-full flex-1 space-y-4 border rounded-lg p-4 h-fit bg-white/5">
             {/* Cart Items */}
             <TypographyH4>Order Details</TypographyH4>
             <div className="space-y-4">
@@ -480,7 +480,7 @@ function CheckoutPage() {
               </div>
             ) : null}
           </div>
-          <div className="border rounded-lg p-4 space-y-6 h-fit bg-white w-full lg:max-w-sm">
+          <div className="border rounded-lg p-4 space-y-6 h-fit bg-white/5 w-full lg:max-w-sm">
             <div className="space-y-4">
               <TypographyH4>Payment Details</TypographyH4>
               {googleUser ? (
@@ -686,7 +686,7 @@ function CheckoutPage() {
             </div>
 
             {/* Actions */}
-            <div className="bg-white sticky lg:relative bottom-4 rounded-lg left-0 right-0 w-full">
+            <div className="bg-white/5 sticky lg:relative bottom-4 rounded-lg left-0 right-0 w-full">
               {renderButtons()}
             </div>
           </div>

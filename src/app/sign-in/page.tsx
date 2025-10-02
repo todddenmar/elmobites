@@ -30,7 +30,7 @@ function OrganizerSignInPage() {
   }, [userData]);
   return (
     <div className="h-[600px] w-full flex flex-col items-center justify-center">
-      <div className="p-4 rounded-lg bg-white/5 border space-y-4">
+      <div className="p-4 rounded-lg bg-white/5/5 border space-y-4">
         <div>
           <h4 className="font-semibold text-lg">Admin Sign In</h4>
           <p className="text-muted-foreground text-sm">

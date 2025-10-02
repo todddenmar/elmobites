@@ -20,7 +20,7 @@ function LoadingCard({
   const [isLoading, setIsLoading] = useState(false);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-neutral-900 p-4">
-      <div className="bg-white dark:bg-neutral-800 shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
+      <div className="bg-white/5 dark:bg-neutral-800 shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
         <h1 className="text-2xl font-bold mb-2 animate-pulse text-neutral-900 dark:text-white">
           {title}
         </h1>

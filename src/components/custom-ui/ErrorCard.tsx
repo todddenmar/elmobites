@@ -22,7 +22,7 @@ function ErrorCard({
   const [isLoading, setIsLoading] = useState(false);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-neutral-900 p-4">
-      <div className="bg-white dark:bg-neutral-800 shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
+      <div className="bg-white/5 dark:bg-neutral-800 shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
         <CircleAlertIcon
           className={cn(
             "w-16 h-16 mx-auto mb-4",

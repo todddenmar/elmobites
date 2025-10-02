@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased dark`}
     >
       <body className="font-sans flex flex-col h-screen">
         <CustomProgressProvider>

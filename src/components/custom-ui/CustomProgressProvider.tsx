@@ -10,7 +10,7 @@ const CustomProgressProvider = ({
   return (
     <ProgressProvider
       height="4px"
-      color="#000000"
+      color="#ef4444"
       options={{ showSpinner: false }}
       shallowRouting
     >
